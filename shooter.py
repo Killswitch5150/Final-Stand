@@ -2,9 +2,6 @@ import pygame
 import sys 
 import random #for spawners 
 
-#testing git
-#testing branching
-
 varGameName = "Final Stand"
 
 # Initiating pygame and variables
