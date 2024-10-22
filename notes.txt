@@ -1,1 +1,7 @@
-notes
+Project Notes:
+Development began on 21 October 2024
+
+To do list:
+-Figure out how to incorporate animations (player shooting/muzzle flash)
+-Clean up code
+-Maybe create a player class to simplify in-game actions
