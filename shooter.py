@@ -2,13 +2,6 @@ import pygame
 import sys 
 import random #for spawners 
 
-#project notes
-#dev began 20241021
-#recent changes:
-#speed logic fixed, god knife removed, performance evals added to game over screen
-#to do:
-#maybe tinker around with animations (sprites are imported, animation was too hard to figure out)
-
 varGameName = "Final Stand"
 
 # Initiating pygame and variables
