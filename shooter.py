@@ -1,20 +1,58 @@
 import pygame  
 import sys 
 import random #for spawners 
+from pygame.locals import *
+
+screen_size_choice_fullscreen = True
 
 varGameName = "Final Stand"
 
 #initiating pygame, setting up window settings and vars
+pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 pygame.display.set_caption(varGameName)
 width, height = 800, 600  # window size vars
-window = pygame.display.set_mode((width, height))  # window size
+game_resolution = (width, height)
+window = pygame.display.set_mode((width, height), pygame.DOUBLEBUF, 24)  # window size
 bullet_ready_to_shoot = True
 bullets, enemies, ammo_boxes = [], [], []
 
+def screen_size():
+    global screen_size_choice_fullscreen, flags, window
+    if screen_size_choice_fullscreen == True:
+        flags = FULLSCREEN | DOUBLEBUF 
+        window = pygame.display.set_mode(game_resolution, flags, 24)
+    if screen_size_choice_fullscreen == False:
+        window = pygame.display.set_mode(game_resolution, pygame.DOUBLEBUF, 24)
+
+screen_size()
+
+def toggle_fullscreen():
+    global screen_size_choice_fullscreen, window
+    screen_size_choice_fullscreen = not screen_size_choice_fullscreen
+    screen_size()
+
+
 def load_and_scale_image(path, scale_factor): #function to load sprites
-    image = pygame.image.load(path)
+    image = pygame.image.load(path).convert_alpha()
     return pygame.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor)))
+
+class InputHandler:
+    def __init__(self):
+        self.fullscreen_key = pygame.K_F11
+
+    def handle_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "QUIT"
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == self.fullscreen_key:
+                    toggle_fullscreen()
+                
+                
+
+        return None  # Return None if no specific action
 
 class GameOver:
     def __init__(self, settings):
@@ -61,10 +99,10 @@ class GameOver:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
-                        main()
-                    if event.key == pygame.K_q:
-                        pygame.quit()
-                        sys.exit()
+                        return "RESTART"
+                    if event.key == pygame.K_q or pygame.K_ESCAPE:
+                        return "QUIT"
+            return None 
 
 class ScaleSettings:
     def __init__(self):
@@ -220,28 +258,16 @@ def reset_game(settings):
         settings.current_wave = 0
 
 def game_over_screen(settings):
+    game_over = GameOver(settings)
     
     while True:
+
         window.fill((0, 0, 0))  # Black background
         font = pygame.font.Font(None, 74)
         font2 = pygame.font.Font(None, 30)
-        kill_eval_var = "deficiency"
-
-        if settings.kill_count < 10:
-            kill_eval_var = "A No Go At This Lane"
-        elif settings.kill_count >= 10 and settings.kill_count < 25:
-            kill_eval_var = "Trash"
-        elif settings.kill_count >= 25 and settings.kill_count < 50:
-            kill_eval_var = "Insubordinate"
-        elif settings.kill_count >= 50 and settings.kill_count < 75:
-            kill_eval_var = "F.N.G."
-        elif settings.kill_count >= 75 and settings.kill_count < 100:
-            kill_eval_var = "Pretty Good"
-        elif settings.kill_count >= 100:
-            kill_eval_var = "Get A Life"
 
         game_over_text = font.render(f"Game Over.", True, (255, 0, 0))
-        kill_eval_text = font2.render(f"Kills: {settings.kill_count}. You are: {kill_eval_var}", True, (255, 0, 0))
+        kill_eval_text = font2.render(f"Kills: {settings.kill_count}. You are: {game_over.evaluate_kills(settings.kill_count)}", True, (255, 0, 0))
         restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
 
         window.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 4))
@@ -257,18 +283,23 @@ def game_over_screen(settings):
                 if event.key == pygame.K_r:
                     reset_game(settings)
                     main()
-                if event.key == pygame.K_q:
-                    pygame.quit()
-                    sys.exit()
+                elif event.key == pygame.K_q or pygame.K_ESCAPE:
+                    main_menu()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_F11]:
+            toggle_fullscreen()
 
 def main_menu():
+
     running = True 
     button_color_dark = (100, 100, 100)
     button_color_light = (254, 254, 0)
     button_rect = pygame.Rect(width // 2 - 100, height // 1.5 - 10, 200, 40)  # Centered play button
     button2_rect = pygame.Rect(width // 2 - 100, height // 2 - 10, 200, 40)
-    
-    while running:
+
+
+    while running: 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -278,6 +309,12 @@ def main_menu():
                     main()  # Start the game
                 if button2_rect.collidepoint(event.pos):  # Check if mouse is over the button
                     mm_controls()  # Show controls
+            if event.type == pygame.KEYDOWN:   
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                if event.key == pygame.K_F11:
+                    toggle_fullscreen()
 
         for x in range(0, width, tile_width):
             for y in range(0, height, tile_height):
@@ -308,17 +345,24 @@ def main_menu():
 
 def mm_controls():
     running = True 
+
     button1_color_dark = (100, 100, 100)
     button1_color_light = (254, 254, 0)
     button1_rect = pygame.Rect(width // 2 - 50, height // 1.5 - 10, 100, 40)  # Centered button
 
     while running:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 main_menu()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button1_rect.collidepoint(event.pos):  # Check if mouse is over the button
                     main_menu()  #go back to main menu
+            if event.type == pygame.KEYDOWN:   
+                if event.key == pygame.K_ESCAPE:
+                    main_menu()
+                if event.key == pygame.K_F11:
+                    toggle_fullscreen()
 
         for x in range(0, width, tile_width):
             for y in range(0, height, tile_height):
@@ -356,41 +400,19 @@ def main():
 
     game_over = GameOver(settings)
 
-    #create the player
     player = Player(settings.width // 5 - player_width // 2, settings.height // 2 - player_height // 2)
     
-    player_isshooting = False
     occupied_positions = set()
     ammo_drop_spawn_timer = 0
     ammo_drop_spawn_interval = 10000 
     enemy_spawn_timer = 0
     enemy_wave = 1
-    ready_to_spawn = True #flag to prevent overspawning
 
     running = True 
     clock = pygame.time.Clock() #to implement frame limit
 
-    #setting flags to control waves
-    wave1 = True
-    wave2 = False
-    wave3 = False
-    wave4 = False
-    wave5 = False
-    wave6 = False 
-
-    #setting spawn rate vars for waves
-    wave2enemyspawnrate = 1000
-    wave2ammospawnrate = 15000
-    wave3enemyspawnrate = 800
-    wave3ammospawnrate = 16000
-    wave4enemyspawnrate = 500
-    wave4ammospawnrate = 17500
-    wave5enemyspawnrate = 250
-    wave5ammospawnrate = 20000
-
-
     while running:
-        dt = clock.tick(60) #limit to 60 fps
+        dt = clock.tick(60) #limit to 60 fps 
 
         wave_kills = settings.kill_count
         
@@ -409,10 +431,14 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and player.ammo_count > 0:
                     player.shoot() 
+                if event.key == pygame.K_ESCAPE:
+                    game_over_screen(settings)
+                if event.key == pygame.K_F11:
+                    toggle_fullscreen()
 
         #reading key presses / key bindings
         keys = pygame.key.get_pressed()
-        player.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_LSHIFT]
+        player.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
         
         player.update()
 
@@ -490,10 +516,7 @@ def main():
             occupied_positions.clear()
 
         if player.health <= 0:
-            #game_over_screen(settings)
-            game_over.display(window)
-            reset_game(settings)
-            continue
+            game_over_screen(window)
 
         for x in range(0, width, tile_width):
             for y in range(0, height, tile_height):
