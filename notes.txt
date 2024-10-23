@@ -10,3 +10,5 @@ To do list:
 -Create different enemy types (some that can shoot, maybe)
 -Migrate some set-up data and instructions to a different py/json file, to clean up main code file
 -Add more comments so I don't forget what different things do and how to manipulate them
+-Add sounds
+-Add Settings to main menu to change full screen and other variables
