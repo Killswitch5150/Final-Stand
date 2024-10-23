@@ -2,50 +2,164 @@ import pygame
 import sys 
 import random #for spawners 
 
-#testing git
-#testing branching
-
 varGameName = "Final Stand"
 
-# Initiating pygame and variables
+#initiating pygame, setting up window settings and vars
 pygame.init()
 pygame.display.set_caption(varGameName)
 width, height = 800, 600  # window size vars
 window = pygame.display.set_mode((width, height))  # window size
 bullet_ready_to_shoot = True
-bullets, enemies, ammo_boxes = []
-player_health, kill_count = 100, 0
+bullets, enemies, ammo_boxes = [], [], []
 
-# Loading assets
-tile_image = pygame.image.load("sprites/grass.png")  # load grass sprite
-tile_width, tile_height = tile_image.get_size()  # sprite dimensions
-spr_player_image = pygame.image.load("sprites/player.png")  # load player sprite
-spr_player_width, spr_player_height = spr_player_image.get_size()  # player dimensions
-spr_player_shooting_image = pygame.image.load("sprites/player_shooting.png")  # load player sprite
-spr_player_shooting_width, spr_player_shooting_height = spr_player_shooting_image.get_size()  # player dimensions
-spr_player_shooting_mf_image = pygame.image.load("sprites/player_shooting_mf.png")  # load player sprite
-spr_player_shooting_mf_width, spr_player_shooting_mf_height = spr_player_shooting_mf_image.get_size()  # player dimensions
-spr_tree_image = pygame.image.load("sprites/tree.png")  # load tree sprite
-spr_tree_width, spr_tree_height = spr_tree_image.get_size()  # tree size
-spr_enemy_image = pygame.image.load("sprites/enemy.png")  # load enemy sprite
-spr_enemy_width, spr_enemy_height = spr_enemy_image.get_size()  # enemy size
-spr_player_bullet = pygame.image.load("sprites/projectile.png")  # load projectile
-spr_player_bullet_width, spr_player_bullet_height = spr_player_bullet.get_size()  # projectile size
-spr_ammo_image = pygame.image.load("sprites/ammo.png") #load ammo sprite
-spr_ammo_width, spr_ammo_height = spr_ammo_image.get_size() #ammo size
+def load_and_scale_image(path, scale_factor): #function to load sprites
+    image = pygame.image.load(path)
+    return pygame.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor)))
 
-#spr_enemy_rect = spr_enemy_image.get_rect()
-#spr_enemy_mask = pygame.mask.from_surface(spr_enemy_image)
-#spr_enemy_mask_image = spr_enemy_mask.to_surface()
+class GameOver:
+    def __init__(self, settings):
+        self.settings = settings 
+        self.font_large = pygame.font.Font(None, 74)
+        self.font_small = pygame.font.Font(None, 30)
+    
+    def display(self, surface):
+        surface.fill((0, 0, 0))
 
+        kill_eval_var = self.evaluate_kills(self.settings.kill_count)
 
-# Scaling player
-scaled_player_image = pygame.transform.scale(spr_player_image, (spr_player_width * 2, spr_player_height * 2))
-scaled_player_width, scaled_player_height = scaled_player_image.get_size()
-scaled_player_shooting_image = pygame.transform.scale(spr_player_shooting_image, (spr_player_shooting_width * 2, spr_player_shooting_height * 2))
-scaled_player_shooting_width, scaled_player_shooting_height = scaled_player_shooting_image.get_size()
-scaled_player_shooting_mf_image = pygame.transform.scale(spr_player_shooting_mf_image, (spr_player_shooting_mf_width * 2, spr_player_shooting_mf_height * 2))
-scaled_player_shooting_mf_width, scaled_player_shooting_mf_height = scaled_player_shooting_mf_image.get_size()
+        game_over_text = self.font_large.render("Game Over.", True, (255, 0, 0))
+        kill_eval_text = self.font_small.render(f"Kills: {self.settings.kill_count}. You are: {kill_eval_var}", True, (255, 0, 0))
+        restart_text = self.font_large.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
+
+        surface.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 4))
+        surface.blit(kill_eval_text, (width // 2 - kill_eval_text.get_width() // 2, height // 3))
+        surface.blit(restart_text, (width // 2 - restart_text.get_width() // 2, height // 2))
+        
+        pygame.display.flip()  # Update the display
+
+        self.handle_input()
+
+    def evaluate_kills(self, kills):
+        if kills < 10:
+            return "A No Go At This Lane"
+        elif kills < 25:
+            return "Trash"
+        elif kills < 50:
+            return "Insubordinate"
+        elif kills < 75:
+            return "F.N.G."
+        elif kills < 100:
+            return "Pretty Good"
+        else:
+            return "Get A Life"
+    
+    def handle_input(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        main()
+                    if event.key == pygame.K_q:
+                        pygame.quit()
+                        sys.exit()
+
+class ScaleSettings:
+    def __init__(self):
+        self.normal = 1
+        self.double = 2
+        self.half = 0.5
+        #new vars can be added to accomodate different scaling
+
+scaling = ScaleSettings()
+
+def load_images():
+    global tile_image, spr_player_image, spr_player_shooting_image, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image
+    tile_image = load_and_scale_image("sprites/grass.png", scaling.normal) #loading sprites and scaling
+    spr_player_image = load_and_scale_image("sprites/player.png", scaling.double)
+    spr_player_shooting_image = load_and_scale_image("sprites/player_shooting.png", scaling.double)
+    spr_player_shooting_mf_image = load_and_scale_image("sprites/player_shooting_mf.png", scaling.double)
+    spr_tree_image = load_and_scale_image("sprites/tree.png", scaling.normal)
+    spr_enemy_image = load_and_scale_image("sprites/enemy.png", scaling.normal)
+    spr_player_bullet = load_and_scale_image("sprites/projectile.png", scaling.half)
+    spr_ammo_image = load_and_scale_image("sprites/ammo.png", scaling.normal)
+
+load_images()
+
+tile_width = tile_image.get_width() #getting sizes for collisions and tiling
+tile_height = tile_image.get_height()
+player_width = spr_player_image.get_width()
+player_height = spr_player_image.get_height()
+
+class GameSettings:
+    def __init__(self):
+        self.game_name = "Final Stand"
+        self.width = 800
+        self.height = 600
+        self.player_magazine_size = 24
+        self.ammo_drop_size = 48
+        self.enemy_spawn_interval = 1500
+        self.ammo_drop_spawn_interval = 10000
+        self.max_ammo_boxes = 2
+        self.kill_count = 0
+
+        #wave settings
+        self.waves = [
+            {'enemy_spawn_rate': 1000, 'ammo_spawn_rate': 15000},
+            {'enemy_spawn_rate': 800, 'ammo_spawn_rate': 16000},
+            {'enemy_spawn_rate': 500, 'ammo_spawn_rate': 17500},
+            {'enemy_spawn_rate': 250, 'ammo_spawn_rate': 20000}
+        ]
+        self.current_wave = 0
+
+class Player:
+    def __init__(self, x, y):
+        self.x = x 
+        self.y = y 
+        self.health = 100
+        self.ammo_count = 24
+        self.ammo_reserve = 0
+        self.is_shooting = False
+        self.is_sprinting = False 
+        self.speed = 3.5
+
+        #loading player sprite
+        self.image = load_and_scale_image("sprites/player.png", 2)
+        self.shooting_image = load_and_scale_image("sprites/player_shooting.png", 2)
+        self.rect = self.image.get_rect(topleft=(self.x,self.y))
+
+    def update(self):
+        #update position based on player input
+        keys = pygame.key.get_pressed()
+        speed = self.speed + 1.5 if self.is_sprinting else self.speed
+
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.y -= speed
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.y += speed
+            
+        #ensure player stays on screen
+        if self.y < 0:
+            self.y = 0
+        if self.y > height - self.rect.height:
+            self.y = height - self.rect.height
+
+        self.rect.topleft = (self.x, self.y)
+        
+    def shoot(self):
+        if self.ammo_count > 0:
+            bullet = Bullet(self.rect.right, self.rect.centery)
+            bullets.append(bullet)
+            print("Bullet created")
+            self.ammo_count -= 1
+        
+    def draw(self, surface):
+        if self.is_shooting:
+            surface.blit(self.shooting_image, self.rect.topleft)
+        else:
+            surface.blit(self.image, self.rect.topleft)
 
 class Bullet:
     def __init__(self, x, y):
@@ -61,26 +175,13 @@ class Bullet:
         surface.blit(self.image, self.rect.topleft)  # instructions to create bullet
 
 class Enemy:
-    def __init__(self, x, y):
+    def __init__(self, x, y, settings):
         original_enemy_width, original_enemy_height = spr_enemy_image.get_size()
         self.image = pygame.transform.scale(spr_enemy_image, (int(original_enemy_width * 2), int(original_enemy_height * 2)))
         self.rect = self.image.get_rect(topleft=(x, y))
-        try:
-            if wave1:
-                self.speed = 0.6  # enemy speed
-            elif wave2:
-                self.speed = 0.9
-            elif wave3:
-                self.speed = 2.0
-            elif wave4:
-                self.speed = 2.5
-            elif wave5:
-                self.speed = 3
-            elif wave6:
-                self.speed = 4
-        except:
-            self.speed = 2
-            
+        
+        wave_speed_mapping = [0.6, 0.9, 2.0, 2.5, 3, 4]
+        self.speed = wave_speed_mapping[settings.current_wave] if settings.current_wave < len(wave_speed_mapping) else 2    
 
     def update(self):
         # Move left when spawned
@@ -108,28 +209,39 @@ ammo_spawn_points = [
     (128, 480),
 ]
 
-def game_over_screen():
+def reset_game(settings):
+        global bullets, enemies, ammo_boxes
+        bullets = []
+        enemies = []
+        ammo_boxes = []
+
+        #reset settings
+        settings.kill_count = 0
+        settings.current_wave = 0
+
+def game_over_screen(settings):
+    
     while True:
         window.fill((0, 0, 0))  # Black background
         font = pygame.font.Font(None, 74)
         font2 = pygame.font.Font(None, 30)
         kill_eval_var = "deficiency"
 
-        if kill_count < 10:
+        if settings.kill_count < 10:
             kill_eval_var = "A No Go At This Lane"
-        elif kill_count >= 10 and kill_count < 25:
+        elif settings.kill_count >= 10 and settings.kill_count < 25:
             kill_eval_var = "Trash"
-        elif kill_count >= 25 and kill_count < 50:
+        elif settings.kill_count >= 25 and settings.kill_count < 50:
             kill_eval_var = "Insubordinate"
-        elif kill_count >= 50 and kill_count < 75:
+        elif settings.kill_count >= 50 and settings.kill_count < 75:
             kill_eval_var = "F.N.G."
-        elif kill_count >= 75 and kill_count < 100:
+        elif settings.kill_count >= 75 and settings.kill_count < 100:
             kill_eval_var = "Pretty Good"
-        elif kill_count >= 100:
+        elif settings.kill_count >= 100:
             kill_eval_var = "Get A Life"
 
         game_over_text = font.render(f"Game Over.", True, (255, 0, 0))
-        kill_eval_text = font2.render(f"Kills: {kill_count}. You are: {kill_eval_var}", True, (255, 0, 0))
+        kill_eval_text = font2.render(f"Kills: {settings.kill_count}. You are: {kill_eval_var}", True, (255, 0, 0))
         restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
 
         window.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 4))
@@ -140,10 +252,10 @@ def game_over_screen():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                main_menu()
             if event.type == pygame.KEYDOWN:   
                 if event.key == pygame.K_r:
+                    reset_game(settings)
                     main()
                 if event.key == pygame.K_q:
                     pygame.quit()
@@ -190,7 +302,7 @@ def main_menu():
         text2_rect = text2.get_rect(center=button2_rect.center)
         window.blit(text, text_rect)
         window.blit(text2, text2_rect)
-        window.blit(scaled_player_image, (width // 5 - scaled_player_width // 2, height // 2 - scaled_player_height // 2))
+        window.blit(spr_player_image, (width // 5 - player_width // 2, height // 2 - player_height // 2))
         
         pygame.display.flip()
 
@@ -203,8 +315,7 @@ def mm_controls():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                main_menu()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button1_rect.collidepoint(event.pos):  # Check if mouse is over the button
                     main_menu()  #go back to main menu
@@ -240,34 +351,21 @@ def mm_controls():
         pygame.display.flip()
 
 def main():
-    global player_health, player_speed, player_isshooting, wave1, wave2, wave3, wave4, wave5, wave6, wave_kills, enemy_wave, kill_count, bullets, enemies, ready_to_spawn, ammo_count, ammo_reserve
+    settings = GameSettings()
+    reset_game(settings)
 
-    # Reset game state
-    player_health = 100
+    game_over = GameOver(settings)
+
+    #create the player
+    player = Player(settings.width // 5 - player_width // 2, settings.height // 2 - player_height // 2)
+    
     player_isshooting = False
-    kill_count = 0
-    wave_kills = 0
-    switch_wave = False 
-    bullets = []
-    enemies = []
-    ammo_boxes = []
-    max_ammo_boxes = 2
-    ammo_count = 7 #rounds in mag
-    ammo_reserve = 0 #rounds not in mag
-    player_can_reload = True
     occupied_positions = set()
     ammo_drop_spawn_timer = 0
     ammo_drop_spawn_interval = 10000 
     enemy_spawn_timer = 0
     enemy_wave = 1
-    enemy_spawn_interval = 1500  # Changed to 1500 milliseconds (1.5 seconds)
     ready_to_spawn = True #flag to prevent overspawning
-    
-    # Initializing positions
-    player_x = width // 5 - scaled_player_width // 2
-    player_y = height // 2 - scaled_player_height // 2
-    player_speed = 3.5  # Player speed
-    player_issprinting = False 
 
     running = True 
     clock = pygame.time.Clock() #to implement frame limit
@@ -290,117 +388,63 @@ def main():
     wave5enemyspawnrate = 250
     wave5ammospawnrate = 20000
 
+
     while running:
         dt = clock.tick(60) #limit to 60 fps
 
-        wave_kills = kill_count
+        wave_kills = settings.kill_count
         
-
-        if kill_count == 10 and wave1 == True:
-            enemy_spawn_interval = 1500
-            ammo_drop_spawn_interval = 10000
-            enemy_wave += 1
-            print(f"Wave {enemy_wave} is beginning")
-            wave1 = False
-            wave2 = True
-            
-        if kill_count == 25 and wave2 == True:
-            enemy_spawn_interval = wave2enemyspawnrate
-            ammo_drop_spawn_interval = wave2ammospawnrate
-            enemy_wave += 1
-            print(f"Wave {enemy_wave} is beginning")
-            wave2 = False
-            wave3 = True
+        if settings.kill_count >= (settings.current_wave + 1) * 10 and settings.current_wave < len(settings.waves):
+            print(f"Wave {settings.current_wave + 1} is beginning")
+            settings.current_wave += 1  # Move to the next wave
         
-        if kill_count == 50 and wave3 == True:
-            enemy_spawn_interval = wave3enemyspawnrate
-            ammo_drop_spawn_interval = wave3ammospawnrate
-            enemy_wave += 1
-            print(f"Wave {enemy_wave} is beginning")
-            wave3 = False
-            wave4 = True
-
-        if kill_count == 75 and wave4 == True:
-            enemy_spawn_interval = wave4enemyspawnrate
-            ammo_drop_spawn_interval = wave4ammospawnrate
-            enemy_wave += 1
-            print(f"Wave {enemy_wave} is beginning")
-            wave4 = False
-            wave5 = True    
-
-        if kill_count == 100 and wave5 == True:
-            enemy_spawn_interval = wave5enemyspawnrate
-            ammo_drop_spawn_interval = wave5ammospawnrate
-            enemy_wave += 1
-            print(f"Wave {enemy_wave} is beginning")
-            wave5 = False
-            wave6 = True
+        if settings.current_wave > 0:
+            enemy_spawn_interval = settings.waves[settings.current_wave - 1]['enemy_spawn_rate']
+            ammo_drop_spawn_interval = settings.waves[settings.current_wave - 1]['ammo_spawn_rate']
 
         for event in pygame.event.get(): #allows user to quit the game
             if event.type == pygame.QUIT:
-                running = False 
-    
-        if not player_issprinting:
-            speed = 3.5
+                running = False
 
-        if player_issprinting:
-            speed = 5
-            print(f'sprinting: {player_issprinting}')
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and player.ammo_count > 0:
+                    player.shoot() 
 
         #reading key presses / key bindings
         keys = pygame.key.get_pressed()
+        player.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_LSHIFT]
+        
+        player.update()
 
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            player_y -= speed 
-            if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
-                player_issprinting = True
-                #print(f'sprinting: {player_issprinting}')
-            if not keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
-                player_issprinting = False
-                #print(f'sprinting: {player_issprinting}')
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            player_y += speed 
-            if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
-                player_issprinting = True
-                #print(f'sprinting: {player_issprinting}')
-            if not keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
-                player_issprinting = False
-                #print(f'sprinting: {player_issprinting}')
-
-
-        if keys[pygame.K_SPACE] and bullet_ready_to_shoot and ammo_count >= 1:
-            bullet = Bullet(player_x + scaled_player_width, player_y + scaled_player_height // 2)
-            bullets.append(bullet)
-            player_isshooting = True
-            bullet_ready_to_shoot = False
-            ammo_count -= 1
-        if not keys[pygame.K_SPACE]:
-            player_isshooting = False
-            bullet_ready_to_shoot = True
+        if player.is_shooting:
+            player.shoot()
         
         if keys[pygame.K_r]:
-            if ammo_reserve > 0 and ammo_count < 7:
+            if player.ammo_reserve > 0 and player.ammo_count < settings.player_magazine_size:
                 # Calculate how many rounds to reload
-                rounds_to_reload = min(7 - ammo_count, ammo_reserve)  # Calculate how many rounds needed to fill the magazine
+                rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 # Update ammo_count and ammo_reserve
-                ammo_count += rounds_to_reload
-                ammo_reserve -= rounds_to_reload
+                player.ammo_count += rounds_to_reload
+                player.ammo_reserve -= rounds_to_reload
             # Ensure ammo_count does not exceed 7 (this check is now redundant but can stay for safety)
-            if ammo_count > 7:
-                ammo_count = 7
+            if player.ammo_count > settings.player_magazine_size:
+                player.ammo_count = settings.player_magazine_size
 
         # Updating bullet positions
         for bullet in bullets[:]:  # Use a copy of the list to avoid modifying it while iterating
             bullet.update()
+            bullet.draw(window)
             # Remove bullet if it goes off screen
-            if bullet.rect.x > width:
+            if bullet.rect.x > settings.width:
                 bullets.remove(bullet)
+            else:
+                bullet.draw(window)
 
         # Spawning enemies
         enemy_spawn_timer += dt # Increment timer
-        if enemy_spawn_timer > enemy_spawn_interval:
+        if enemy_spawn_timer > settings.enemy_spawn_interval:
             spawn_point = random.choice(enemy_spawn_points)
-            enemies.append(Enemy(*spawn_point))
+            enemies.append(Enemy(*spawn_point, settings))
             enemy_spawn_timer = 0
 
         # Update enemies and check for collisions
@@ -409,22 +453,19 @@ def main():
             # Remove enemy if it goes off screen
             if enemy.rect.x < 0:
                 enemies.remove(enemy)
-                player_health -= 10
+                player.health -= 10
         
             # Check for collision with bullets
             for bullet in bullets[:]:  # Use a copy of the list for safe removal
                 if bullet.rect.colliderect(enemy.rect):
                     bullets.remove(bullet)
                     enemies.remove(enemy)
-                    kill_count += 1
+                    settings.kill_count += 1
                     break
-            #if enemy.rect.colliderect(pygame.Rect(player_x, player_y, 1, 1)):
-             #   enemies.remove(enemy)
-              #  kill_count += 1
                 
         ammo_drop_spawn_timer += dt  # Increment timer
-        if ammo_drop_spawn_timer > ammo_drop_spawn_interval:
-            if len(ammo_boxes) < max_ammo_boxes:
+        if ammo_drop_spawn_timer > settings.ammo_drop_spawn_interval:
+            if len(ammo_boxes) < settings.max_ammo_boxes:
                 max_attempts = 10
                 attempts = 0
                 spawn_successful = False
@@ -439,34 +480,27 @@ def main():
                 attempts += 1
 
         for ammo in ammo_boxes[:]:
-            if ammo.rect.colliderect(pygame.Rect(player_x, player_y, scaled_player_width, scaled_player_height)):
+            if ammo.rect.colliderect(player.rect):
                     ammo_boxes.remove(ammo)
                     occupied_positions.remove(ammo.rect.topleft)
-                    ammo_reserve += 21
+                    player.ammo_reserve += settings.ammo_drop_size
                     break
         
         if not ammo_boxes:
             occupied_positions.clear()
 
-        if player_health <= 0:
-            game_over_screen()
-
-        #if player_isshooting:
-         #   window.blit(spr_player_shooting_mf_image, (player_x, player_y))
-        #if not player_isshooting:
-         #   window.blit(spr_player_shooting_image, (player_x, player_y))
-
-        if player_y < 0:
-            player_y = 0
-        if player_y > height - scaled_player_height:
-            player_y = height - scaled_player_height
+        if player.health <= 0:
+            #game_over_screen(settings)
+            game_over.display(window)
+            reset_game(settings)
+            continue
 
         for x in range(0, width, tile_width):
             for y in range(0, height, tile_height):
                 window.blit(tile_image, (x, y))
 
         #drawing the game objects
-        window.blit(scaled_player_image, (player_x, player_y))
+        player.draw(window) 
         window.blit(spr_tree_image, (192, 64))
         window.blit(spr_tree_image, (192, 96))
         window.blit(spr_tree_image, (192, 128))
@@ -488,9 +522,9 @@ def main():
 
          # Draw health and kill count GUI
         font = pygame.font.Font(None, 36)  # Creates a font object
-        health_text = font.render(f"Health: {player_health}", True, (255, 0, 0))
-        kill_text = font.render(f"Kills: {kill_count}", True, (255, 0, 0))
-        ammo_text = font.render(f"Ammo: {ammo_count} / {ammo_reserve}", True, (255, 0, 0))
+        health_text = font.render(f"Health: {player.health}", True, (255, 0, 0))
+        kill_text = font.render(f"Kills: {settings.kill_count}", True, (255, 0, 0))
+        ammo_text = font.render(f"Ammo: {player.ammo_count} / {player.ammo_reserve}", True, (255, 0, 0))
         window.blit(health_text, (10, 10))
         window.blit(kill_text, (width // 2 - kill_text.get_width() // 2, 10))
         window.blit(ammo_text, (width // 1.5 - ammo_text.get_width() // 2, 10))
