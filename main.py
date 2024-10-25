@@ -1,9 +1,10 @@
 import pygame  
-import sys 
+import sys
+from settings import GameSettings, ScaleSettings 
 import random #for spawners 
 from pygame.locals import *
 
-screen_size_choice_fullscreen = True
+screen_size_choice_fullscreen = False
 
 varGameName = "Final Stand"
 
@@ -104,13 +105,6 @@ class GameOver:
                         return "QUIT"
             return None 
 
-class ScaleSettings:
-    def __init__(self):
-        self.normal = 1
-        self.double = 2
-        self.half = 0.5
-        #new vars can be added to accomodate different scaling
-
 scaling = ScaleSettings()
 
 def load_images():
@@ -130,27 +124,6 @@ tile_width = tile_image.get_width() #getting sizes for collisions and tiling
 tile_height = tile_image.get_height()
 player_width = spr_player_image.get_width()
 player_height = spr_player_image.get_height()
-
-class GameSettings:
-    def __init__(self):
-        self.game_name = "Final Stand"
-        self.width = 800
-        self.height = 600
-        self.player_magazine_size = 24
-        self.ammo_drop_size = 48
-        self.enemy_spawn_interval = 1500
-        self.ammo_drop_spawn_interval = 10000
-        self.max_ammo_boxes = 2
-        self.kill_count = 0
-
-        #wave settings
-        self.waves = [
-            {'enemy_spawn_rate': 1000, 'ammo_spawn_rate': 15000},
-            {'enemy_spawn_rate': 800, 'ammo_spawn_rate': 16000},
-            {'enemy_spawn_rate': 500, 'ammo_spawn_rate': 17500},
-            {'enemy_spawn_rate': 250, 'ammo_spawn_rate': 20000}
-        ]
-        self.current_wave = 0
 
 class Player:
     def __init__(self, x, y):
