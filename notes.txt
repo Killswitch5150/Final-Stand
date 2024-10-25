@@ -10,3 +10,13 @@ To do list:
 -Let ammo drops have random amounts of ammo in them
 -Vary enemy speed (implemented, but broken)
 -UI Formatting needs to be fixed (move ammo under health UI)
+-Figure out how to incorporate animations for different states (player shooting/muzzle flash)
+-Create more game world visual elements
+-Create probability based enemy speeds that become more likely to be fast as waves increase
+-Make a UI element to display the current wave
+-Create probability based ammo drops containing different amounts of ammo
+-Create different enemy types (some that can shoot, maybe)
+-Migrate some set-up data and instructions to a different py/json file, to clean up main code file
+-Add more comments so I don't forget what different things do and how to manipulate them
+-Add sounds
+-Add Settings to main menu to change full screen and other variables
