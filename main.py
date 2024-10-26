@@ -3,23 +3,9 @@ import sys
 from settings import GameSettings, ScaleSettings 
 import random #for spawners 
 from pygame.locals import *
+from variables import *
 
-settings = GameSettings() #create settings obj
-
-screen_size_choice_fullscreen = False #default value for fullscreen toggle
-
-varGameName = "Final Stand" #name of the game to appear on window and UI
-
-#initiating pygame, setting up window settings and vars
-pygame.mixer.pre_init(44100, 16, 2, 4096) #initializing audio support
-pygame.init() #initiating pygame 
-pygame.display.set_caption(varGameName) #set window text to name of the game
-width, height = 800, 600  # window size vars
-game_resolution = (width, height) #put window size tuple into game_resolution var
-window = pygame.display.set_mode((game_resolution), pygame.DOUBLEBUF, 24)  # window size set to game res
-bullet_ready_to_shoot = True #starts playing with shooting action enabled
-bullets, enemies, ammo_boxes = [], [], [] #declares empty lists to be written during gameplay
-
+#function defs
 def screen_size(): #function used by the full screen toggling function
     global screen_size_choice_fullscreen, flags, window #access global vars
     if screen_size_choice_fullscreen == True: 
@@ -33,11 +19,62 @@ def toggle_fullscreen(): #function to toggle between fullscreen and windowed mod
     screen_size_choice_fullscreen = not screen_size_choice_fullscreen #if fullscreen is true, make it false and vice-versa
     screen_size() #call screen_size function to initiate changes to window size
 
-
 def load_and_scale_image(path, scale_factor): #function to load sprites
     image = pygame.image.load(path).convert_alpha() #load image
     return pygame.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor))) #return image and necessary variables
 
+def load_images(): #function to load game images
+    #make global vars accessible
+    global tile_image, spr_player_image, spr_player_shooting_image, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
+    
+    #define and provide paths to game assets to be loaded and scales
+    tile_image = load_and_scale_image("sprites/grass.png", scaling.normal)
+    spr_player_image = load_and_scale_image("sprites/player.png", scaling.double)
+    spr_player_shooting_image = load_and_scale_image("sprites/player_shooting.png", scaling.double)
+    spr_player_shooting_mf_image = load_and_scale_image("sprites/player_shooting_mf.png", scaling.double)
+    spr_tree_image = load_and_scale_image("sprites/tree.png", scaling.normal)
+    spr_enemy_image = load_and_scale_image("sprites/enemy.png", scaling.normal)
+    spr_player_bullet = load_and_scale_image("sprites/projectile.png", scaling.half)
+    spr_ammo_image = load_and_scale_image("sprites/ammo.png", scaling.normal)
+
+def get_stats(): #function to calculate widths and heights
+    #make global vars accessible
+    global tile_width, tile_height, player_width, player_height
+
+    #define width and height vars
+    tile_width = tile_image.get_width() 
+    tile_height = tile_image.get_height()
+    player_width = spr_player_image.get_width()
+    player_height = spr_player_image.get_height()
+
+def reset_game(settings): #function to reset tracked game vars
+        global bullets, enemies, ammo_boxes #access necessary global vars
+        bullets = [] #set bullets list to empty
+        enemies = [] #set enemies list to empty
+        ammo_boxes = [] #set ammo boxes list to empty
+
+        #reset settings
+        settings.kill_count = 0 #set kill count to zero
+        settings.current_wave = 1 #set wave to one
+
+def spawn_points_init():
+    global enemy_spawn_points, ammo_spawn_points
+
+    #define enemy spawn points
+    enemy_spawn_points = [
+        (width, random.randint(0, height - 50)),
+        (width, random.randint(0, height - 50)),
+        (width, random.randint(0, height - 50)),
+    ]
+
+    #define ammo box spawn points
+    ammo_spawn_points = [
+        (128, 96),
+        (128, 480),
+    ]
+#end function defs
+
+#class defs
 class InputHandler: #handle 'Global' game key inputs (accessible anywhere in the game)
     def __init__(self):
         self.fullscreen_key = pygame.K_F11 #set the full screen toggle key to F11
@@ -105,36 +142,6 @@ class GameOver: #class to define end of game events
                     if event.key == pygame.K_q or pygame.K_ESCAPE: #if player hits Q or ESC key
                         return "QUIT" #return quit value
             return None #return none if input is invalid 
-
-scaling = ScaleSettings() #define scaling from ScaleSettings class (imported)
-
-def load_images(): #function to load game images
-    #make global vars accessible
-    global tile_image, spr_player_image, spr_player_shooting_image, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
-    
-    #define and provide paths to game assets to be loaded and scales
-    tile_image = load_and_scale_image("sprites/grass.png", scaling.normal)
-    spr_player_image = load_and_scale_image("sprites/player.png", scaling.double)
-    spr_player_shooting_image = load_and_scale_image("sprites/player_shooting.png", scaling.double)
-    spr_player_shooting_mf_image = load_and_scale_image("sprites/player_shooting_mf.png", scaling.double)
-    spr_tree_image = load_and_scale_image("sprites/tree.png", scaling.normal)
-    spr_enemy_image = load_and_scale_image("sprites/enemy.png", scaling.normal)
-    spr_player_bullet = load_and_scale_image("sprites/projectile.png", scaling.half)
-    spr_ammo_image = load_and_scale_image("sprites/ammo.png", scaling.normal)
-
-load_images() #execute load_images function
-
-def get_stats(): #function to calculate widths and heights
-    #make global vars accessible
-    global tile_width, tile_height, player_width, player_height
-
-    #define width and height vars
-    tile_width = tile_image.get_width() 
-    tile_height = tile_image.get_height()
-    player_width = spr_player_image.get_width()
-    player_height = spr_player_image.get_height()
-
-get_stats() #execute function to define size vars
 
 class Player: #player class
     def __init__(self, x, y):
@@ -227,30 +234,9 @@ class Ammo: #ammo class
     def draw(self, surface):
         #draw ammo box to screen
         surface.blit(self.image, self.rect.topleft)
+#end class defs
 
-#define enemy spawn points
-enemy_spawn_points = [
-    (width, random.randint(0, height - 50)),
-    (width, random.randint(0, height - 50)),
-    (width, random.randint(0, height - 50)),
-]
-
-#define ammo box spawn points
-ammo_spawn_points = [
-    (128, 96),
-    (128, 480),
-]
-
-def reset_game(settings): #function to reset tracked game vars
-        global bullets, enemies, ammo_boxes #access necessary global vars
-        bullets = [] #set bullets list to empty
-        enemies = [] #set enemies list to empty
-        ammo_boxes = [] #set ammo boxes list to empty
-
-        #reset settings
-        settings.kill_count = 0 #set kill count to zero
-        settings.current_wave = 1 #set wave to one
-
+#begin scene funcs
 def game_over_screen(settings): #function to handle the game over screen
     while True: #loop to play until player exits game over screen
 
@@ -527,7 +513,7 @@ def main(settings): #function to handle the main game loop
             occupied_positions.clear() #clears the positions variable to free up space for new ones
 
         if player.health <= 0: #if player health is zero
-            game_over_screen(window) #show the game over screen
+            game_over_screen(settings) #show the game over screen
 
         #draw tiled background
         for x in range(0, width, tile_width): 
@@ -570,6 +556,16 @@ def main(settings): #function to handle the main game loop
         #display the screen to the player
         pygame.display.flip()
 
+#define init objects
+settings = GameSettings() #create settings obj
+scaling = ScaleSettings() #define scaling from ScaleSettings class (imported)
+
+#run init functions
+load_images() #execute load_images function
+get_stats() #execute function to define size vars
+spawn_points_init() #initiate function to define spawn points
+
+#scene load order
 main_menu()  #when game launches, start at the main menu
 pygame.quit()
 sys.exit()
