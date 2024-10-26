@@ -4,6 +4,8 @@ from settings import GameSettings, ScaleSettings
 import random #for spawners 
 from pygame.locals import *
 
+settings = GameSettings()
+
 screen_size_choice_fullscreen = False
 
 varGameName = "Final Stand"
@@ -191,7 +193,7 @@ class Enemy:
         self.image = pygame.transform.scale(spr_enemy_image, (int(original_enemy_width * 2), int(original_enemy_height * 2)))
         self.rect = self.image.get_rect(topleft=(x, y))
         
-        wave_speed_mapping = [0.6, 0.9, 2.0, 2.5, 3, 4]
+        wave_speed_mapping = [0.6, 0.9, 2.0, 2.5, 3, 4, 6, 8, 10, 12.5, 15]
         self.speed = wave_speed_mapping[settings.current_wave] if settings.current_wave < len(wave_speed_mapping) else 2    
 
     def update(self):
@@ -228,19 +230,19 @@ def reset_game(settings):
 
         #reset settings
         settings.kill_count = 0
-        settings.current_wave = 0
+        settings.current_wave = 1
 
 def game_over_screen(settings):
-    game_over = GameOver(settings)
+    #game_over = GameOver(settings)
     
     while True:
 
         window.fill((0, 0, 0))  # Black background
         font = pygame.font.Font(None, 74)
         font2 = pygame.font.Font(None, 30)
-
+        
         game_over_text = font.render(f"Game Over.", True, (255, 0, 0))
-        kill_eval_text = font2.render(f"Kills: {settings.kill_count}. You are: {game_over.evaluate_kills(settings.kill_count)}", True, (255, 0, 0))
+        kill_eval_text = font2.render(f"Kills: {settings.kill_count}. You are: {GameOver.evaluate_kills(GameOver, kills=settings.kill_count)}", True, (255, 0, 0))
         restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
 
         window.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 4))
@@ -252,15 +254,14 @@ def game_over_screen(settings):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 main_menu()
-            if event.type == pygame.KEYDOWN:   
-                if event.key == pygame.K_r:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F11:
+                    toggle_fullscreen()   
+                elif event.key == pygame.K_r:
                     reset_game(settings)
-                    main()
+                    main(settings)
                 elif event.key == pygame.K_q or pygame.K_ESCAPE:
                     main_menu()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_F11]:
-            toggle_fullscreen()
 
 def main_menu():
 
@@ -279,7 +280,7 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_rect.collidepoint(event.pos):  # Check if mouse is over the button
-                    main()  # Start the game
+                    main(settings)  # Start the game
                 if button2_rect.collidepoint(event.pos):  # Check if mouse is over the button
                     mm_controls()  # Show controls
             if event.type == pygame.KEYDOWN:   
@@ -367,11 +368,11 @@ def mm_controls():
 
         pygame.display.flip()
 
-def main():
-    settings = GameSettings()
+def main(settings):
+    #settings = GameSettings()
     reset_game(settings)
 
-    game_over = GameOver(settings)
+    #game_over = GameOver(settings)
 
     player = Player(settings.width // 5 - player_width // 2, settings.height // 2 - player_height // 2)
     
@@ -379,7 +380,7 @@ def main():
     ammo_drop_spawn_timer = 0
     ammo_drop_spawn_interval = 10000 
     enemy_spawn_timer = 0
-    enemy_wave = 1
+    #enemy_wave = 1
 
     running = True 
     clock = pygame.time.Clock() #to implement frame limit
@@ -389,10 +390,15 @@ def main():
 
         wave_kills = settings.kill_count
         
-        if settings.kill_count >= (settings.current_wave + 1) * 10 and settings.current_wave < len(settings.waves):
+        if settings.kill_count >= 10 * settings.current_wave:  # Change this line
             print(f"Wave {settings.current_wave + 1} is beginning")
             settings.current_wave += 1  # Move to the next wave
-        
+    
+        # Ensure you don't exceed the maximum number of waves defined
+        if settings.current_wave > len(settings.waves):
+            settings.current_wave = len(settings.waves)  # Cap to maximum waves
+
+        # Set enemy spawn rate based on current wave
         if settings.current_wave > 0:
             enemy_spawn_interval = settings.waves[settings.current_wave - 1]['enemy_spawn_rate']
             ammo_drop_spawn_interval = settings.waves[settings.current_wave - 1]['ammo_spawn_rate']
@@ -521,10 +527,13 @@ def main():
         health_text = font.render(f"Health: {player.health}", True, (255, 0, 0))
         kill_text = font.render(f"Kills: {settings.kill_count}", True, (255, 0, 0))
         ammo_text = font.render(f"Ammo: {player.ammo_count} / {player.ammo_reserve}", True, (255, 0, 0))
+        current_wave = settings.current_wave
+        current_wave_text = font.render(f"Wave: {current_wave}", True, (255, 0, 0))
         window.blit(health_text, (10, 10))
+        window.blit(ammo_text, (10, 40))
         window.blit(kill_text, (width // 2 - kill_text.get_width() // 2, 10))
-        window.blit(ammo_text, (width // 1.5 - ammo_text.get_width() // 2, 10))
-   
+        window.blit(current_wave_text, (width // 2 - kill_text.get_width() // 2, 40))
+
         pygame.display.flip()
 
 main_menu()  # Show the main menu first
