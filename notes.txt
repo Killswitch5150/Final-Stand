@@ -3,7 +3,6 @@ Development began on 21 October 2024
 
 To do list:
 -Figure out how to incorporate animations (player shooting/muzzle flash)
--Clean up code
 -Maybe create a player class to simplify in-game actions
 -Implement a reloading timer so player can't spam the reload button
 -Figure out how to incorporate animations for different states (player shooting/muzzle flash)
@@ -12,6 +11,5 @@ To do list:
 -Create probability based ammo drops containing different amounts of ammo
 -Create different enemy types (some that can shoot, maybe)
 -Migrate more set-up data and instructions to a different py/json file, to clean up main code file
--Add more comments so I don't forget what different things do and how to manipulate them
--Add sounds
+-Add sounds/audio support
 -Add Settings to main menu to change full screen and other variables
