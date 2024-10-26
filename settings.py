@@ -1,25 +1,25 @@
 import pygame
 #game settings and image settings
 
-class ScaleSettings:
+class ScaleSettings: #create ScaleSettings class
     def __init__(self):
         self.normal = 1
         self.double = 2
         self.half = 0.5
         #new vars can be added to accomodate different scaling
 
-class GameSettings:
+class GameSettings: #create GameSettings class
     def __init__(self):
-        self.game_name = "Final Stand"
-        self.width = 800
-        self.height = 600
-        self.player_magazine_size = 24
-        self.ammo_drop_size = 48
-        self.enemy_spawn_interval = 1500
-        self.ammo_drop_spawn_interval = 10000
-        self.max_ammo_boxes = 2
-        self.kill_count = 0
-        self.current_wave = 1
+        self.game_name = "Final Stand" #game name
+        self.width = 800 #window width
+        self.height = 600 #window height
+        self.player_magazine_size = 24 #max amount of ammo player can have loaded at once
+        self.ammo_drop_size = 48 #ammount contained in ammo drops
+        self.enemy_spawn_interval = 1500 #placeholder enemy spawn interval for initialization
+        self.ammo_drop_spawn_interval = 10000 #placeholder ammo drop spawn interval for initialization
+        self.max_ammo_boxes = 2 #maximum amount of ammo boxes that can be in the game at the same time
+        self.kill_count = 0 #game starts with zero kills
+        self.current_wave = 1 #game starts at wave 1
 
         #wave settings
         self.waves = [
