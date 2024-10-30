@@ -3,8 +3,15 @@ Development began on 21 October 2024
 
 To do list:
 -Figure out how to incorporate animations (player shooting/muzzle flash)
--Clean up code
 -Maybe create a player class to simplify in-game actions
 -Implement a reloading timer so player can't spam the reload button
 -Make ammo drops less frequent
 -Let ammo drops have random amounts of ammo in them
+-Figure out how to incorporate animations for different states (player shooting/muzzle flash)
+-Create more game world visual elements
+-Create probability based enemy speeds that become more likely to be fast as waves increase
+-Create probability based ammo drops containing different amounts of ammo
+-Create different enemy types (some that can shoot, maybe)
+-Migrate more set-up data and instructions to a different py/json file, to clean up main code file
+-Add sounds/audio support
+-Add Settings to main menu to change full screen and other variables
