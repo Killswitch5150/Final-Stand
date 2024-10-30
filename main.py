@@ -238,21 +238,20 @@ class Ammo: #ammo class
 
 #begin scene funcs
 def game_over_screen(settings): #function to handle the game over screen
+    import game_fonts
+    import gui_text_vals
+
     while True: #loop to play until player exits game over screen
 
         window.fill((0, 0, 0)) #black background
-        font = pygame.font.Font(None, 74) #define font 
-        font2 = pygame.font.Font(None, 30) #define font2
         
         #define UI element variables for the game over display
-        game_over_text = font.render(f"Game Over.", True, (255, 0, 0)) 
-        kill_eval_text = font2.render(f"Kills: {settings.kill_count}. You are: {GameOver.evaluate_kills(GameOver, kills=settings.kill_count)}", True, (255, 0, 0))
-        restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
-
+        kill_eval_text = game_fonts.font2.render(f"Kills: {settings.kill_count}. You are: {GameOver.evaluate_kills(GameOver, kills=settings.kill_count)}", True, (255, 0, 0))
+    
         #draw UI elements to the game over screen
-        window.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 4))
+        window.blit(gui_text_vals.game_over_text, (width // 2 - gui_text_vals.game_over_text.get_width() // 2, height // 4))
         window.blit(kill_eval_text, (width // 2 - kill_eval_text.get_width() // 2, height // 3))
-        window.blit(restart_text, (width // 2 - restart_text.get_width() // 2, height // 2))
+        window.blit(gui_text_vals.restart_text, (width // 2 - gui_text_vals.restart_text.get_width() // 2, height // 2))
 
         #draw the display to the player
         pygame.display.flip()
@@ -271,9 +270,10 @@ def game_over_screen(settings): #function to handle the game over screen
                     main_menu() #exit back to the main menu
 
 def main_menu(): #main menu function
+    import game_fonts
+    import gui_text_vals
     #define variables for the main menu 
-    button_color_dark = (100, 100, 100) #define dark button color
-    button_color_light = (254, 254, 0) #define light button color
+
     button_rect = pygame.Rect(width // 2 - 100, height // 1.5 - 10, 200, 40) #define rectangle for button1 (play button)
     button2_rect = pygame.Rect(width // 2 - 100, height // 2 - 10, 200, 40) #define rectangle for button2 (controls button)
 
@@ -310,26 +310,21 @@ def main_menu(): #main menu function
         window.blit(spr_tree_image, (192, 512))
 
         #drawing UI elements
-        font = pygame.font.Font(None, 74) #define font for menu
-        title_text = font.render(varGameName, True, (255, 0, 0)) #use varGameName for the main menu screen
+        title_text = game_fonts.font.render(varGameName, True, (255, 0, 0)) #use varGameName for the main menu screen
         window.blit(title_text, (width // 2 - title_text.get_width() // 2, height // 3)) #draw game title on screen
-        pygame.draw.rect(window, button_color_dark, button_rect) #create play button
-        pygame.draw.rect(window, button_color_dark, button2_rect) #create controls button
-        smallfont = pygame.font.Font(None, 34) #define smallfont for menu
-        text = smallfont.render('PLAY', True, button_color_light) #create label for play button
-        text_rect = text.get_rect(center=button_rect.center) #create object out of label
-        text2 = smallfont.render('CONTROLS', True, button_color_light) #create label for controls button
-        text2_rect = text2.get_rect(center=button2_rect.center) #create object out of label
-        window.blit(text, text_rect) #draw play text and button to window
-        window.blit(text2, text2_rect) #draw controls text and button to window
+        pygame.draw.rect(window, gui_text_vals.button_color_dark, button_rect) #create play button
+        pygame.draw.rect(window, gui_text_vals.button_color_dark, button2_rect) #create controls button
+        text_rect = gui_text_vals.text.get_rect(center=button_rect.center) #create object out of label
+        text2_rect = gui_text_vals.text2.get_rect(center=button2_rect.center) #create object out of label
+        window.blit(gui_text_vals.text, text_rect) #draw play text and button to window
+        window.blit(gui_text_vals.text2, text2_rect) #draw controls text and button to window
         window.blit(spr_player_image, (width // 5 - player_width // 2, height // 2 - player_height // 2)) #draw player to window
         
         pygame.display.flip() #show the screen to the player
 
 def mm_controls(): #function to control the controls screen
-    #define variables
-    button1_color_dark = (100, 100, 100)
-    button1_color_light = (254, 254, 0)
+    import game_fonts
+    import gui_text_vals
 
     #define the rectangle position and dimensions for the back button
     button1_rect = pygame.Rect(width // 2 - 50, height // 1.5 - 10, 100, 40)
@@ -354,44 +349,26 @@ def mm_controls(): #function to control the controls screen
             for y in range(0, height, tile_height):
                 window.blit(tile_image, (x, y))
 
-        #defining text for UI
-        varControls = "Game Controls:"
-        varGClineone = "Up/Down Arrow Keys or 'W' and 'S' keys to move"
-        varGClinetwo = "'R' to reload"
-        varGClinethree = "Spacebar to shoot"
-        varGClinefour = "Ammo drops randomly spawn to give you more ammo"
-
-        #defining fonts
-        font = pygame.font.Font(None, 30)
-        font2 = pygame.font.Font(None, 18)
-        smallfont = pygame.font.Font(None, 34)
-
-        #creating text displays
-        title_text1 = font.render(varControls, True, (255, 0, 0))
-        title_text2 = font2.render(varGClineone, True, (255, 0, 0))
-        title_text3 = font2.render(varGClinetwo, True, (255, 0, 0))
-        title_text4 = font2.render(varGClinethree, True, (255, 0, 0))
-        title_text5 = font2.render(varGClinefour, True, (255, 0, 0))
-
         #drawing text displays to the screen
-        window.blit(title_text1, (width // 2 - title_text1.get_width() // 2, height // 5))
-        window.blit(title_text2, (width // 2 - title_text2.get_width() // 2, height // 4))
-        window.blit(title_text3, (width // 2 - title_text3.get_width() // 2, height // 3))
-        window.blit(title_text4, (width // 2 - title_text4.get_width() // 2, height // 2))
-        window.blit(title_text5, (width // 2 - title_text5.get_width() // 2, height // 2 - 50))
+        window.blit(gui_text_vals.title_text1, (width // 2 - gui_text_vals.title_text1.get_width() // 2, height // 5))
+        window.blit(gui_text_vals.title_text2, (width // 2 - gui_text_vals.title_text2.get_width() // 2, height // 4))
+        window.blit(gui_text_vals.title_text3, (width // 2 - gui_text_vals.title_text3.get_width() // 2, height // 3))
+        window.blit(gui_text_vals.title_text4, (width // 2 - gui_text_vals.title_text4.get_width() // 2, height // 2))
+        window.blit(gui_text_vals.title_text5, (width // 2 - gui_text_vals.title_text5.get_width() // 2, height // 2 - 50))
         
-        pygame.draw.rect(window, button1_color_dark, button1_rect) #define the back buttons rectangle
+        pygame.draw.rect(window, gui_text_vals.button1_color_dark, button1_rect) #define the back buttons rectangle
 
-        text = smallfont.render('BACK', True, button1_color_light) #create object for back button text
-        text_rect = text.get_rect(center=button1_rect.center) #create object for back button rectangle
+        text_rect = gui_text_vals.text.get_rect(center=button1_rect.center) #create object for back button rectangle
         
         #draw the back button the screen
-        window.blit(text, text_rect)
+        window.blit(gui_text_vals.backtext, text_rect)
 
         #display the screen to the user
         pygame.display.flip()
 
 def main(settings): #function to handle the main game loop
+    import game_fonts
+    
     reset_game(settings) #reset the games tracked variables whenever main loop is called
 
     #create the player object
@@ -542,12 +519,11 @@ def main(settings): #function to handle the main game loop
             ammo.draw(window)
 
         #draw health and kill count GUI
-        font = pygame.font.Font(None, 36)  #define font
-        health_text = font.render(f"Health: {player.health}", True, (255, 0, 0))
-        kill_text = font.render(f"Kills: {settings.kill_count}", True, (255, 0, 0))
-        ammo_text = font.render(f"Ammo: {player.ammo_count} / {player.ammo_reserve}", True, (255, 0, 0))
+        health_text = game_fonts.guifont.render(f"Health: {player.health}", True, (255, 0, 0))
+        kill_text = game_fonts.guifont.render(f"Kills: {settings.kill_count}", True, (255, 0, 0))
+        ammo_text = game_fonts.guifont.render(f"Ammo: {player.ammo_count} / {player.ammo_reserve}", True, (255, 0, 0))
         current_wave = settings.current_wave
-        current_wave_text = font.render(f"Wave: {current_wave}", True, (255, 0, 0))
+        current_wave_text = game_fonts.guifont.render(f"Wave: {current_wave}", True, (255, 0, 0))
         window.blit(health_text, (10, 10))
         window.blit(ammo_text, (10, 40))
         window.blit(kill_text, (width // 2 - kill_text.get_width() // 2, 10))
