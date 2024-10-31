@@ -3,41 +3,58 @@ from settings import GameSettings, ScaleSettings
 from pygame.locals import *
 from variables import *
 
+console_debugging = True 
+
 clock = pygame.time.Clock() #to implement frame limit
 
 #sound functions
 def sound_reloading():
     sounds.reloading.set_volume(sounds.default_volume)
     pygame.mixer.Sound.play(sounds.reloading)
+    if console_debugging: #debug output
+        print('sound reloading playing')
     pygame.mixer.music.stop()
 
 def sound_shooting():
     sounds.shooting.set_volume(sounds.default_volume)
     pygame.mixer.Sound.play(sounds.shooting)
+    if console_debugging: #debug output
+        print('sound shooting playing')
     pygame.mixer.music.stop()
 
 #function defs
 def screen_size(): #function used by the full screen toggling function
     global screen_size_choice_fullscreen, flags, window #access global vars
     if screen_size_choice_fullscreen == True: 
+        if console_debugging: #debug output
+            print(f'fullscreen toggle set to {screen_size_choice_fullscreen}')
         flags = FULLSCREEN | DOUBLEBUF #define full screen vars
         window = pygame.display.set_mode(game_resolution, flags, 24) #set window to full screen
     if screen_size_choice_fullscreen == False:
+        if console_debugging: #debug output
+            print(f'fullscreen toggle set to off {screen_size_choice_fullscreen}')
         window = pygame.display.set_mode(game_resolution, pygame.DOUBLEBUF, 24) #set window to game_resolution size 
 
 def toggle_fullscreen(): #function to toggle between fullscreen and windowed mode
     global screen_size_choice_fullscreen, window #access global vars
     screen_size_choice_fullscreen = not screen_size_choice_fullscreen #if fullscreen is true, make it false and vice-versa
+    if console_debugging: #debug output
+            print('fullscreen toggling')
     screen_size() #call screen_size function to initiate changes to window size
 
 def load_and_scale_image(path, scale_factor): #function to load sprites
+    if console_debugging: #debug output
+            print('loading and scaling images')
     image = pygame.image.load(path).convert_alpha() #load image
+    if console_debugging: #debug output
+            print('complete')
     return pygame.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor))) #return image and necessary variables
 
 def load_images(): #function to load game images
     #make global vars accessible
     global tile_image, spr_player_image, spr_player_shooting_image, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
-    
+    if console_debugging: #debug output
+            print('fetching assets')
     #define and provide paths to game assets to be loaded and scales
     tile_image = load_and_scale_image("sprites/grass.png", scaling.normal)
     spr_player_image = load_and_scale_image("sprites/player.png", scaling.double)
@@ -47,16 +64,22 @@ def load_images(): #function to load game images
     spr_enemy_image = load_and_scale_image("sprites/enemy.png", scaling.normal)
     spr_player_bullet = load_and_scale_image("sprites/projectile.png", scaling.half)
     spr_ammo_image = load_and_scale_image("sprites/ammo.png", scaling.normal)
+    if console_debugging: #debug output
+            print('assets fetched')
 
 def get_stats(): #function to calculate widths and heights
     #make global vars accessible
     global tile_width, tile_height, player_width, player_height
 
     #define width and height vars
+    if console_debugging: #debug output
+            print('calculating heights and widths')
     tile_width = tile_image.get_width() 
     tile_height = tile_image.get_height()
     player_width = spr_player_image.get_width()
     player_height = spr_player_image.get_height()
+    if console_debugging: #debug output
+            print('heights and widths calculated')
 
 def reset_game(settings): #function to reset tracked game vars
         global bullets, enemies, ammo_boxes #access necessary global vars
@@ -67,6 +90,9 @@ def reset_game(settings): #function to reset tracked game vars
         #reset settings
         settings.kill_count = 0 #set kill count to zero
         settings.current_wave = 1 #set wave to one
+        if console_debugging: #debug output
+            print(f'game stats reset. {bullets} bullets, {enemies} enemies, {ammo_boxes}, ammo boxes')
+            print(f'kill count: {settings.kill_count}, current wave: {settings.current_wave}')
 
 def spawn_points_init():
     global enemy_spawn_points, ammo_spawn_points
@@ -77,12 +103,16 @@ def spawn_points_init():
         (width, random.randint(0, height - 50)),
         (width, random.randint(0, height - 50)),
     ]
+    if console_debugging: #debug output
+            print('enemy spawn points set')
 
     #define ammo box spawn points
     ammo_spawn_points = [
         (128, 96),
         (128, 480),
     ]
+    if console_debugging: #debug output
+            print('ammo spawn points set')
 #end function defs
 
 #class defs
@@ -93,10 +123,14 @@ class InputHandler: #handle 'Global' game key inputs (accessible anywhere in the
     def handle_input(self):
         for event in pygame.event.get(): #read events
             if event.type == pygame.QUIT: #if user quits
+                if console_debugging: #debug output
+                    print('user triggered quit')
                 return "QUIT" #return quit value to controller
 
             if event.type == pygame.KEYDOWN: #read keydown events
                 if event.key == self.fullscreen_key: #if F11 is pressed down
+                    if console_debugging: #debug output
+                        print('user triggered fullscreen toggle')
                     toggle_fullscreen() #execute the full screen toggle function
 
         return None  #return none if input is invalid
@@ -106,16 +140,20 @@ class GameOver: #class to define end of game events
         self.settings = settings 
         self.font_large = pygame.font.Font(None, 74) #larger font for end game GUI
         self.font_small = pygame.font.Font(None, 30) #smaller font for end game GUI
-    
+        
     def display(self, surface):
+        import game_fonts
+
         surface.fill((0, 0, 0)) #black background
 
-        kill_eval_var = self.evaluate_kills(self.settings.kill_count) #pass settings and kill count to evaluate_kills function to define kill eval variable
-
+        kill_eval_var = GameOver.evaluate_kills(self, settings.kill_count) #pass settings and kill count to evaluate_kills function to define kill eval variable
+        if console_debugging: #debug output
+            print('kill_eval_var set')
+        
         #defining GUI elements
-        game_over_text = self.font_large.render("Game Over.", True, (255, 0, 0))
-        kill_eval_text = self.font_small.render(f"Kills: {self.settings.kill_count}. You are: {kill_eval_var}", True, (255, 0, 0))
-        restart_text = self.font_large.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
+        game_over_text = game_fonts.font.render("Game Over.", True, (255, 0, 0))
+        kill_eval_text = game_fonts.font2.render(f"Kills: {settings.kill_count}. You are: {kill_eval_var}", True, (255, 0, 0))
+        restart_text = game_fonts.font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
 
         #draw GUI elements to the screen
         surface.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 4))
@@ -126,9 +164,11 @@ class GameOver: #class to define end of game events
         pygame.display.flip()
 
         #read player input
-        self.handle_input()
+        GameOver.handle_input(self)
 
     def evaluate_kills(self, kills): #defines the value to be stores in the kill eval variable 
+        if console_debugging: #debug output
+            print('evaluate_kills function running')
         if kills < 10:
             return "A No Go At This Lane"
         elif kills < 25:
@@ -149,8 +189,12 @@ class GameOver: #class to define end of game events
                     pygame.quit() #quit game
                 if event.type == pygame.KEYDOWN: #read key input
                     if event.key == pygame.K_r: #if player hits R key
+                        if console_debugging: #debug output
+                            print('user triggered game restart')
                         return "RESTART" #return restart value
                     if event.key == pygame.K_q or pygame.K_ESCAPE: #if player hits Q or ESC key
+                        if console_debugging: #debug output
+                            print('user triggered quit game')
                         return "QUIT" #return quit value
             return None #return none if input is invalid 
 
@@ -204,13 +248,19 @@ class Player: #player class
 
 class Bullet: #bullet class
     def __init__(self, x, y):
+        self.x = x 
+        self.y = y 
         original_bullet_width, original_bullet_height = spr_player_bullet.get_size()  #scaling down bullet
         self.image = pygame.transform.scale(spr_player_bullet, (int(original_bullet_width * 0.5), int(original_bullet_height * 0.5)))  #scaling bullet down
         self.rect = self.image.get_rect(topleft=(x, y))  #create rectangle based on sprite dimensions
+        self.mask = pygame.mask.from_surface(self.image)
         self.speed = 4  #set speed
         
-    def update(self):
+    def update(self, x, y):
         self.rect.x += self.speed  #bullet moves to the right when created
+        #self.x = x
+        #self.y = y  
+        #print(f"bullet at {self.x}, {self.y}")
         
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)  #instructions to create bullet
@@ -218,8 +268,11 @@ class Bullet: #bullet class
 class Enemy: #enemy class
     def __init__(self, x, y, settings):
         #initialize enemies
+        self.x = x 
+        self.y = y
         original_enemy_width, original_enemy_height = spr_enemy_image.get_size()
         self.image = pygame.transform.scale(spr_enemy_image, (int(original_enemy_width * 2), int(original_enemy_height * 2)))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(x, y))
         
         #define enemy speed by wave
@@ -227,9 +280,12 @@ class Enemy: #enemy class
         #enemy speed increases based on wave
         self.speed = wave_speed_mapping[settings.current_wave] if settings.current_wave < len(wave_speed_mapping) else 2    
 
-    def update(self):
+    def update(self, x, y):
         #move left when spawned
         self.rect.x -= self.speed #move left when spawned at the defined speed
+        #self.x = x 
+        #self.y = y 
+        #print(f"enemy at {self.x}, {self.y}")
 
     def draw(self, surface):
         #draw the enemy
@@ -251,13 +307,16 @@ class Ammo: #ammo class
 def game_over_screen(settings): #function to handle the game over screen
     import game_fonts, gui_text_vals
 
+    eval_output = GameOver.evaluate_kills(GameOver, settings.kill_count)
+
     while True: #loop to play until player exits game over screen
 
         window.fill((0, 0, 0)) #black background
         
         #define UI element variables for the game over display
-        kill_eval_text = game_fonts.font2.render(f"Kills: {settings.kill_count}. You are: {GameOver.evaluate_kills(GameOver, kills=settings.kill_count)}", True, (255, 0, 0))
+        kill_eval_text = game_fonts.font2.render(f"Kills: {settings.kill_count}. You are: {eval_output}", True, (255, 0, 0))
     
+
         #draw UI elements to the game over screen
         window.blit(gui_text_vals.game_over_text, (width // 2 - gui_text_vals.game_over_text.get_width() // 2, height // 4))
         window.blit(kill_eval_text, (width // 2 - kill_eval_text.get_width() // 2, height // 3))
@@ -440,7 +499,7 @@ def main(settings): #function to handle the main game loop
 
         #updating bullet positions
         for bullet in bullets[:]:  #use a copy of the list to avoid unwanted modifications
-            bullet.update() #execute bullet class update method
+            bullet.update(x, y) #execute bullet class update method
             bullet.draw(window) #create bullet on game surface
             
             if bullet.rect.x > settings.width: #if bullet leaves playable area (screen)
@@ -457,7 +516,7 @@ def main(settings): #function to handle the main game loop
 
         #update enemies and check for collisions
         for enemy in enemies[:]:  #using a copy of the enemies list
-            enemy.update() #execute the update method of the enemy class
+            enemy.update(enemy.x, enemy.y) #execute the update method of the enemy class
             if enemy.rect.x < 0: #if enemy goes off screen
                 enemies.remove(enemy) #remove the enemy from the game
                 player.health -= 10 #remove 10 health from the player
@@ -469,6 +528,13 @@ def main(settings): #function to handle the main game loop
                     enemies.remove(enemy) #remove enemy object
                     settings.kill_count += 1 #add one to kill count
                     break #ensure if statement does not execute multiple times per kill. should be redundant and unneccessary
+                #offset_x, offset_y = int(enemy.update() - bullet.x), int(enemy.y - bullet.y)
+                #if bullet.mask.overlap(enemy.mask, (offset_x, offset_y)): #if bullet collides with enemy
+                #    print("offset")
+                #    bullets.remove(bullet) #remove bullet object
+                #    enemies.remove(enemy) #remove enemy object
+                #    settings.kill_count += 1 #add one to kill count
+                #    break #ensure if statement does not execute multiple times per kill. should be redundant and unneccessary
                 
         ammo_drop_spawn_timer += dt  #increment timer for ammo drop spawner
         if ammo_drop_spawn_timer > settings.ammo_drop_spawn_interval: #if ammo drop is ready to spawn
