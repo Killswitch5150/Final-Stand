@@ -23,6 +23,11 @@ def sound_shooting():
     pygame.mixer.music.stop()
 
 #function defs
+def create_tiling():
+    for x in range(0, width, tile_width):
+            for y in range(0, height, tile_height):
+                window.blit(tile_image, (x, y))
+
 def screen_size(): #function used by the full screen toggling function
     global screen_size_choice_fullscreen, flags, window #access global vars
     if screen_size_choice_fullscreen == True: 
@@ -364,10 +369,7 @@ def main_menu(): #main menu function
                 if event.key == pygame.K_F11: #if player presses F11
                     toggle_fullscreen() #execute the fullscreen toggling function
 
-        #tile the tile_image to create a background
-        for x in range(0, width, tile_width):
-            for y in range(0, height, tile_height):
-                window.blit(tile_image, (x, y))
+        create_tiling()
 
         #draw world elements for the background
         window.blit(spr_tree_image, (192, 64))
@@ -411,10 +413,7 @@ def mm_controls(): #function to control the controls screen
                 if event.key == pygame.K_F11: #if player presses F11 key
                     toggle_fullscreen() #execute the fullscreen toggling function
 
-        #tiling for background display
-        for x in range(0, width, tile_width):
-            for y in range(0, height, tile_height):
-                window.blit(tile_image, (x, y))
+        create_tiling()
 
         #drawing text displays to the screen
         window.blit(gui_text_vals.title_text1, (width // 2 - gui_text_vals.title_text1.get_width() // 2, height // 5))
@@ -499,7 +498,7 @@ def main(settings): #function to handle the main game loop
 
         #updating bullet positions
         for bullet in bullets[:]:  #use a copy of the list to avoid unwanted modifications
-            bullet.update(x, y) #execute bullet class update method
+            bullet.update(player.x, player.y) #execute bullet class update method
             bullet.draw(window) #create bullet on game surface
             
             if bullet.rect.x > settings.width: #if bullet leaves playable area (screen)
@@ -568,10 +567,7 @@ def main(settings): #function to handle the main game loop
         if player.health <= 0: #if player health is zero
             game_over_screen(settings) #show the game over screen
 
-        #draw tiled background
-        for x in range(0, width, tile_width): 
-            for y in range(0, height, tile_height):
-                window.blit(tile_image, (x, y))
+        create_tiling()
 
         #drawing the game objects
         player.draw(window) 
