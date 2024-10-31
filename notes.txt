@@ -9,4 +9,4 @@ To do list:
 -Create more game world visual elements
 -Create different enemy types (some that can shoot, maybe)
 -Migrate more set-up data and instructions to a different py/json file, to clean up main code file
--Add Settings to main menu to change full screen and other variables
+-Add Settings to main menu to change full screen, volume and other variables
