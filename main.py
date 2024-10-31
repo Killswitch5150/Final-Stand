@@ -1,9 +1,16 @@
-import pygame  
-import sys
-from settings import GameSettings, ScaleSettings 
-import random #for spawners 
+import pygame, sys, random, sounds
+from settings import GameSettings, ScaleSettings  
 from pygame.locals import *
 from variables import *
+
+#sound functions
+def sound_reloading():
+    pygame.mixer.Sound.play(sounds.reloading)
+    pygame.mixer.music.stop()
+
+def sound_shooting():
+    pygame.mixer.Sound.play(sounds.shooting)
+    pygame.mixer.music.stop()
 
 #function defs
 def screen_size(): #function used by the full screen toggling function
@@ -238,8 +245,7 @@ class Ammo: #ammo class
 
 #begin scene funcs
 def game_over_screen(settings): #function to handle the game over screen
-    import game_fonts
-    import gui_text_vals
+    import game_fonts, gui_text_vals
 
     while True: #loop to play until player exits game over screen
 
@@ -270,8 +276,7 @@ def game_over_screen(settings): #function to handle the game over screen
                     main_menu() #exit back to the main menu
 
 def main_menu(): #main menu function
-    import game_fonts
-    import gui_text_vals
+    import game_fonts, gui_text_vals
     #define variables for the main menu 
 
     button_rect = pygame.Rect(width // 2 - 100, height // 1.5 - 10, 200, 40) #define rectangle for button1 (play button)
@@ -323,8 +328,7 @@ def main_menu(): #main menu function
         pygame.display.flip() #show the screen to the player
 
 def mm_controls(): #function to control the controls screen
-    import game_fonts
-    import gui_text_vals
+    import game_fonts, gui_text_vals
 
     #define the rectangle position and dimensions for the back button
     button1_rect = pygame.Rect(width // 2 - 50, height // 1.5 - 10, 100, 40)
@@ -408,6 +412,7 @@ def main(settings): #function to handle the main game loop
                 running = False #game is no longer running
             if event.type == pygame.KEYDOWN: #key press listener
                 if event.key == pygame.K_SPACE and player.ammo_count > 0: #if user hits space bar and has ammo
+                    sound_shooting()
                     player.shoot() #execute the shoot method from the player class 
                 if event.key == pygame.K_ESCAPE: #if user hits escape key
                     game_over_screen(settings) #show the game over screen
@@ -427,6 +432,7 @@ def main(settings): #function to handle the main game loop
                 #calculate how many rounds to reload
                 rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 #update ammo_count and ammo_reserve variables
+                sound_reloading()
                 player.ammo_count += rounds_to_reload
                 player.ammo_reserve -= rounds_to_reload
 
@@ -483,7 +489,9 @@ def main(settings): #function to handle the main game loop
             if ammo.rect.colliderect(player.rect): #if player collides with ammo box
                     ammo_boxes.remove(ammo) #remove the object instance of ammo box
                     occupied_positions.remove(ammo.rect.topleft) #remove ammo box from occupied positions
-                    player.ammo_reserve += settings.ammo_drop_size #add the amount from ammo drop to the player's ammo reserve
+                    possible_ammo_drops = [12, 24, 36, 48, 72]
+                    ammo_drop_size_decider = random.choice(possible_ammo_drops)
+                    player.ammo_reserve += ammo_drop_size_decider #add the amount from ammo drop to the player's ammo reserve
                     break #should be redundat, ensures system wont execute this multiple times per ammo drop
         
         if not ammo_boxes: #if there are no ammo boxes

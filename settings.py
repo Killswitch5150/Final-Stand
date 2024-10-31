@@ -1,4 +1,4 @@
-import pygame
+import pygame 
 #game settings and image settings
 
 class ScaleSettings: #create ScaleSettings class
@@ -14,7 +14,6 @@ class GameSettings: #create GameSettings class
         self.width = 800 #window width
         self.height = 600 #window height
         self.player_magazine_size = 24 #max amount of ammo player can have loaded at once
-        self.ammo_drop_size = 48 #ammount contained in ammo drops
         self.enemy_spawn_interval = 1500 #placeholder enemy spawn interval for initialization
         self.ammo_drop_spawn_interval = 10000 #placeholder ammo drop spawn interval for initialization
         self.max_ammo_boxes = 2 #maximum amount of ammo boxes that can be in the game at the same time
@@ -23,15 +22,15 @@ class GameSettings: #create GameSettings class
 
         #wave settings
         self.waves = [
-            {'enemy_spawn_rate': 1000, 'ammo_spawn_rate': 15000},
-            {'enemy_spawn_rate': 800, 'ammo_spawn_rate': 16000},
-            {'enemy_spawn_rate': 500, 'ammo_spawn_rate': 17500},
-            {'enemy_spawn_rate': 250, 'ammo_spawn_rate': 20000},
-            {'enemy_spawn_rate': 200, 'ammo_spawn_rate': 22500},
-            {'enemy_spawn_rate': 150, 'ammo_spawn_rate': 25000},
-            {'enemy_spawn_rate': 100, 'ammo_spawn_rate': 27500},
-            {'enemy_spawn_rate': 75, 'ammo_spawn_rate': 30000},
-            {'enemy_spawn_rate': 50, 'ammo_spawn_rate': 32500},
-            {'enemy_spawn_rate': 25, 'ammo_spawn_rate': 35000}
+            {'enemy_spawn_rate': 1000, 'ammo_spawn_rate': 20000},
+            {'enemy_spawn_rate': 800, 'ammo_spawn_rate': 22500},
+            {'enemy_spawn_rate': 500, 'ammo_spawn_rate': 25000},
+            {'enemy_spawn_rate': 250, 'ammo_spawn_rate': 27500},
+            {'enemy_spawn_rate': 200, 'ammo_spawn_rate': 30000},
+            {'enemy_spawn_rate': 150, 'ammo_spawn_rate': 32500},
+            {'enemy_spawn_rate': 100, 'ammo_spawn_rate': 35000},
+            {'enemy_spawn_rate': 75, 'ammo_spawn_rate': 40000},
+            {'enemy_spawn_rate': 50, 'ammo_spawn_rate': 45000},
+            {'enemy_spawn_rate': 25, 'ammo_spawn_rate': 50000}
         ]
         
