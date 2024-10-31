@@ -3,12 +3,16 @@ from settings import GameSettings, ScaleSettings
 from pygame.locals import *
 from variables import *
 
+clock = pygame.time.Clock() #to implement frame limit
+
 #sound functions
 def sound_reloading():
+    sounds.reloading.set_volume(sounds.default_volume)
     pygame.mixer.Sound.play(sounds.reloading)
     pygame.mixer.music.stop()
 
 def sound_shooting():
+    sounds.shooting.set_volume(sounds.default_volume)
     pygame.mixer.Sound.play(sounds.shooting)
     pygame.mixer.music.stop()
 
@@ -386,8 +390,6 @@ def main(settings): #function to handle the main game loop
 
     running = True #allows main loop to execute
 
-    clock = pygame.time.Clock() #to implement frame limit
-
     while running:
         #main game loop
         dt = clock.tick(60) #limit to 60 fps 
@@ -489,7 +491,7 @@ def main(settings): #function to handle the main game loop
             if ammo.rect.colliderect(player.rect): #if player collides with ammo box
                     ammo_boxes.remove(ammo) #remove the object instance of ammo box
                     occupied_positions.remove(ammo.rect.topleft) #remove ammo box from occupied positions
-                    possible_ammo_drops = [12, 24, 36, 48, 72]
+                    possible_ammo_drops = [12, 12, 12, 12, 24, 24, 24, 36, 36, 48, 72] #define ammo amounts possible in ammo drops (repeats to increase probability)
                     ammo_drop_size_decider = random.choice(possible_ammo_drops)
                     player.ammo_reserve += ammo_drop_size_decider #add the amount from ammo drop to the player's ammo reserve
                     break #should be redundat, ensures system wont execute this multiple times per ammo drop
@@ -552,4 +554,5 @@ spawn_points_init() #initiate function to define spawn points
 #scene load order
 main_menu()  #when game launches, start at the main menu
 pygame.quit()
+pygame.mixer.stop() #should be redundant. ensures sound doesn't continue to attempt to play
 sys.exit()
