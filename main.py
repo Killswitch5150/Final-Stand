@@ -6,10 +6,10 @@ from variables import *
 console_debugging = False #change this to True to enable debugging log in console
 
 last_reload_time = 0
-reload_delay = 2000
-shoot_delay = 1000
+reload_delay = 1500
+shoot_delay = 500
 reload_completion_time = 0
-
+reloaderrors_spam = False 
 
 clock = pygame.time.Clock() #to implement frame limit
 
@@ -152,6 +152,19 @@ def spawn_points_init():
 #end function defs
 
 #class defs
+class ReloadErrors:
+    def draw(self, surface):
+        import gui_text_vals
+        messageisvisible = True
+
+        #while messageisvisible:
+        #    surface.blit(gui_text_vals.reloadinprogresstext_cantshoot, (width // 2 - gui_text_vals.reloadingtext_empty.get_width() // 2, height // 4))
+        #    current_time3 = pygame.time.get_ticks()
+        #    msg_delay = 1000
+        #    if current_time3 >= msg_delay:
+        #        messageisvisible = False
+
+    
 class InputHandler: #handle 'Global' game key inputs (accessible anywhere in the game)
     def __init__(self):
         self.fullscreen_key = pygame.K_F11 #set the full screen toggle key to F11
@@ -548,7 +561,13 @@ def main(settings): #function to handle the main game loop
                         print('player triggered shoot')
                     if current_time2 - reload_completion_time >= shoot_delay:
                         sound_shooting()
-                        player.shoot() #execute the shoot method from the player class 
+                        player.shoot() #execute the shoot method from the player class
+                    elif current_time2 - reload_completion_time < shoot_delay:
+                        global reloaderrors_spam
+                        if console_debugging:
+                            print('you cant shoot while reloading')
+                        reloaderrors_spam = True 
+                        
                 if event.key == pygame.K_ESCAPE: #if user hits escape key
                     if console_debugging: #debug output
                         print('player pressed ESC')
@@ -688,6 +707,8 @@ def main(settings): #function to handle the main game loop
             if console_debugging:    
                 print('player needs to reload')
                 print('reload message displaying')
+        if reloaderrors_spam:
+            ReloadErrors_obj.draw(ReloadErrors, window)
     
         #drawing bullets
         for bullet in bullets:
@@ -718,6 +739,7 @@ def main(settings): #function to handle the main game loop
 #define init objects
 settings = GameSettings() #create settings obj
 scaling = ScaleSettings() #define scaling from ScaleSettings class (imported)
+ReloadErrors_obj = ReloadErrors
 
 #run init functions
 load_images() #execute load_images function
