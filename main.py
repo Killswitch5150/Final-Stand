@@ -1,11 +1,36 @@
-import pygame, sys, random, sounds
+import pygame, sys, random, sounds, time 
 from settings import GameSettings, ScaleSettings  
 from pygame.locals import *
 from variables import *
+from threading import Thread #to implement reload timer
+from threading import Lock #to implement reload timer data passing
+
+lock = Lock() #should enable me to pass info to and from threads
 
 console_debugging = False #change this to True to enable debugging log in console
 
 clock = pygame.time.Clock() #to implement frame limit
+timingreload = False
+can_reload = False
+checkthread = False
+
+#define threading functions
+def threaded_reload_timer(timingreload, can_reload, checkthread):
+    import time 
+    print('thread running')
+    while checkthread == True: #i cant get updated vars passed to this thread
+        if timingreload == True:
+            if console_debugging:
+                print('beginning reload timer')
+            can_reload = False 
+            time.sleep(1)
+            if console_debugging:
+                print('reload timer complete')
+        elif timingreload == False:
+            if console_debugging:
+                print('can reload')
+            can_reload = True 
+#end threading function
 
 #sound functions
 def sound_reloading():
@@ -564,9 +589,20 @@ def main(settings): #function to handle the main game loop
             if console_debugging: #debug output
                     print('player pressed R')
             if player.ammo_reserve > 0 and player.ammo_count < settings.player_magazine_size: #if player can shoot
+                global timingreload, can_reload, checkthread
                 #calculate how many rounds to reload
                 rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 #update ammo_count and ammo_reserve variables
+                
+                ##time logic##
+                timingreload = True 
+                checkthread = True
+                
+                if console_debugging:
+                    print(f'can reload is: {can_reload}')
+                
+                #time.sleep(2) #causes a stutter to simulate reload time
+
                 if console_debugging: #debug output
                     print('playing reload sound')
                 sound_reloading()
@@ -712,8 +748,14 @@ load_images() #execute load_images function
 get_stats() #execute function to define size vars
 spawn_points_init() #initiate function to define spawn points
 
+#create threads
+thread_reload_time = Thread(target=threaded_reload_timer(timingreload, can_reload, checkthread)) #thread to handle reload timer
+thread_reload_time.start() #starts background thread for reloading
+thread_main = Thread(target=main_menu()) #main game handling thread
+thread_main.start() #starts thread
+
 #scene load order
-main_menu()  #when game launches, start at the main menu
+#main_menu()  #when game launches, start at the main menu
 pygame.quit()
 pygame.mixer.stop() #should be redundant. ensures sound doesn't continue to attempt to play
 sys.exit()
