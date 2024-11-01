@@ -165,6 +165,17 @@ class InputHandler: #handle 'Global' game key inputs (accessible anywhere in the
 
         return None  #return none if input is invalid
 
+class ReloadControl:
+    def __init__(self):
+        self.needstoreload = True
+
+    def update(self, surface, has_ammo):
+        import gui_text_vals
+        if has_ammo:
+            window.blit(gui_text_vals.reloadingtext, (width // 2 - gui_text_vals.reloadingtext.get_width() // 2, height // 4))
+        if not has_ammo:
+            window.blit(gui_text_vals.reloadingtext_empty, (width // 2 - gui_text_vals.reloadingtext_empty.get_width() // 2, height // 4))
+
 class GameOver: #class to define end of game events
     def __init__(self, settings):
         self.settings = settings 
@@ -653,6 +664,18 @@ def main(settings): #function to handle the main game loop
         create_tiling() #creates the background
         render_environment() #creates the game world
         player.draw(window) #creates the player
+
+        #reloading gui logic
+        if player.ammo_count == 0:
+            if player.ammo_reserve > 0:
+                has_ammo = True
+            elif player.ammo_reserve == 0:
+                has_ammo = False
+            reloadingalert = ReloadControl
+            reloadingalert.update(reloadingalert, window, has_ammo)
+            if console_debugging:    
+                print('player needs to reload')
+                print('reload message displaying')
     
         #drawing bullets
         for bullet in bullets:

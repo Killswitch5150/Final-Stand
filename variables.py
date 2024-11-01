@@ -6,6 +6,7 @@ width, height = 800, 600  # window size vars
 game_resolution = (width, height) #put window size tuple into game_resolution var
 bullet_ready_to_shoot = True #starts playing with shooting action enabled
 bullets, enemies, ammo_boxes = [], [], [] #declares empty lists to be written during gameplay
+reloading_text = []
 
 #sound initialization vars
 s_freq = 44100
