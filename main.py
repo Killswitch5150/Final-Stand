@@ -29,11 +29,44 @@ def create_tiling():
                 window.blit(tile_image, (x, y))
 
 def create_road():
-    #window.blit(spr_road_top, (200, 300))
     for x in range(0, 800, road_top_width):
         window.blit(spr_road_top, (x, 300))
     for x in range(0, 800, road_bottom_width):
         window.blit(spr_road_bottom, (x, 332))
+
+def decide_bush_points():
+    global bush_x, bush_x_alt
+    bush_x_list = [300, 400, 500, 600]
+    bush_x = random.choice(bush_x_list)
+    bush_x_alt_list = [1, 2]
+    bush_x_alt_raw = random.choice(bush_x_alt_list)
+    if bush_x_alt_raw == 1:
+        bush_x_alt_int = 32
+    elif bush_x_alt_raw == 2:
+        bush_x_alt_int = -32
+    bush_x_alt = bush_x + bush_x_alt_int
+
+def create_bushes():
+    window.blit(spr_bush_image, (bush_x, 64))
+    window.blit(spr_bush_image, (bush_x, 96))
+    window.blit(spr_bush_image, (bush_x, 128))
+    window.blit(spr_bush_image, (bush_x, 160))
+    window.blit(spr_bush_image, (bush_x, 192))
+    window.blit(spr_bush_image, (bush_x, 384))
+    window.blit(spr_bush_image, (bush_x, 416))
+    window.blit(spr_bush_image, (bush_x, 448))
+    window.blit(spr_bush_image, (bush_x, 480))
+    window.blit(spr_bush_image, (bush_x, 512))
+    window.blit(spr_bush_image, (bush_x_alt, 64))
+    window.blit(spr_bush_image, (bush_x_alt, 96))
+    window.blit(spr_bush_image, (bush_x_alt, 128))
+    window.blit(spr_bush_image, (bush_x_alt, 160))
+    window.blit(spr_bush_image, (bush_x_alt, 192))
+    window.blit(spr_bush_image, (bush_x_alt, 384))
+    window.blit(spr_bush_image, (bush_x_alt, 416))
+    window.blit(spr_bush_image, (bush_x_alt, 448))
+    window.blit(spr_bush_image, (bush_x_alt, 480))
+    window.blit(spr_bush_image, (bush_x_alt, 512))
 
 def render_environment():
             #draw world elements for the background
@@ -75,7 +108,7 @@ def load_and_scale_image(path, scale_factor): #function to load sprites
 
 def load_images(): #function to load game images
     #make global vars accessible
-    global tile_image, spr_player_image, spr_player_shooting_image, spr_road_top, spr_road_bottom, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
+    global tile_image, spr_player_image, spr_player_shooting_image, spr_bush_image, spr_road_top, spr_road_bottom, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
     if console_debugging: #debug output
             print('fetching assets')
     #define and provide paths to game assets to be loaded and scales
@@ -89,6 +122,7 @@ def load_images(): #function to load game images
     spr_ammo_image = load_and_scale_image("sprites/ammo.png", scaling.normal)
     spr_road_top = load_and_scale_image("sprites/road.png", scaling.normal)
     spr_road_bottom_sprite = load_and_scale_image("sprites/road.png", scaling.normal)
+    spr_bush_image = load_and_scale_image("sprites/bush.png", scaling.normal)
     spr_road_bottom = pygame.transform.rotate(spr_road_bottom_sprite, -180.0)
     if console_debugging: #debug output
             print('assets fetched')
@@ -414,6 +448,8 @@ def main_menu(): #main menu function
 
     running = True #enables running loop to begin
 
+    decide_bush_points()
+
     while running: 
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if player quits
@@ -443,6 +479,7 @@ def main_menu(): #main menu function
 
         create_tiling() #creates the background
         render_environment() #creates the game world
+        create_bushes()
 
         #drawing UI elements
         title_text = game_fonts.font.render(varGameName, True, (255, 0, 0)) #use varGameName for the main menu screen
@@ -518,6 +555,8 @@ def main(settings): #function to handle the main game loop
     ammo_drop_spawn_timer = 0 #spawn timer placeholder variable for initialization
     ammo_drop_spawn_interval = 100000 #spawn timer placeholder variable for initialization
     enemy_spawn_timer = 0 #enemy timer placeholder variable for initialization
+
+    decide_bush_points()
 
     running = True #allows main loop to execute
 
@@ -727,6 +766,7 @@ def main(settings): #function to handle the main game loop
         window.blit(kill_text, (width // 2 - kill_text.get_width() // 2, 10))
         window.blit(current_wave_text, (width // 2 - kill_text.get_width() // 2, 40))
 
+        create_bushes()
         #display the screen to the player
         pygame.display.flip()
 
