@@ -17,7 +17,8 @@ checkthread = False
 #define threading functions
 def threaded_reload_timer(timingreload, can_reload, checkthread):
     import time 
-    print('thread running')
+    if console_debugging:
+        print('thread running')
     while checkthread == True: #i cant get updated vars passed to this thread
         if timingreload == True:
             if console_debugging:
