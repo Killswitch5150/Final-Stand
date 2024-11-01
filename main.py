@@ -28,6 +28,13 @@ def create_tiling():
             for y in range(0, height, tile_height):
                 window.blit(tile_image, (x, y))
 
+def create_road():
+    #window.blit(spr_road_top, (200, 300))
+    for x in range(0, 800, road_top_width):
+        window.blit(spr_road_top, (x, 300))
+    for x in range(0, 800, road_bottom_width):
+        window.blit(spr_road_bottom, (x, 332))
+
 def render_environment():
             #draw world elements for the background
             window.blit(spr_tree_image, (192, 64))
@@ -36,6 +43,8 @@ def render_environment():
             window.blit(spr_tree_image, (192, 448))
             window.blit(spr_tree_image, (192, 480))
             window.blit(spr_tree_image, (192, 512))
+            create_road()
+            
 
 def screen_size(): #function used by the full screen toggling function
     global screen_size_choice_fullscreen, flags, window #access global vars
@@ -66,7 +75,7 @@ def load_and_scale_image(path, scale_factor): #function to load sprites
 
 def load_images(): #function to load game images
     #make global vars accessible
-    global tile_image, spr_player_image, spr_player_shooting_image, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
+    global tile_image, spr_player_image, spr_player_shooting_image, spr_road_top, spr_road_bottom, spr_player_shooting_mf_image, spr_tree_image, spr_enemy_image, spr_player_bullet, spr_ammo_image 
     if console_debugging: #debug output
             print('fetching assets')
     #define and provide paths to game assets to be loaded and scales
@@ -78,12 +87,15 @@ def load_images(): #function to load game images
     spr_enemy_image = load_and_scale_image("sprites/enemy.png", scaling.normal)
     spr_player_bullet = load_and_scale_image("sprites/projectile.png", scaling.half)
     spr_ammo_image = load_and_scale_image("sprites/ammo.png", scaling.normal)
+    spr_road_top = load_and_scale_image("sprites/road.png", scaling.normal)
+    spr_road_bottom_sprite = load_and_scale_image("sprites/road.png", scaling.normal)
+    spr_road_bottom = pygame.transform.rotate(spr_road_bottom_sprite, -180.0)
     if console_debugging: #debug output
             print('assets fetched')
 
 def get_stats(): #function to calculate widths and heights
     #make global vars accessible
-    global tile_width, tile_height, player_width, player_height
+    global tile_width, tile_height, player_width, player_height, road_top_height, road_top_width, road_bottom_height, road_bottom_width
 
     #define width and height vars
     if console_debugging: #debug output
@@ -92,6 +104,10 @@ def get_stats(): #function to calculate widths and heights
     tile_height = tile_image.get_height()
     player_width = spr_player_image.get_width()
     player_height = spr_player_image.get_height()
+    road_top_height = spr_road_top.get_height()
+    road_top_width = spr_road_top.get_width()
+    road_bottom_height = spr_road_bottom.get_height()
+    road_bottom_width = spr_road_bottom.get_width()
     if console_debugging: #debug output
             print('heights and widths calculated')
 
@@ -635,8 +651,8 @@ def main(settings): #function to handle the main game loop
             game_over_screen(settings) #show the game over screen
 
         create_tiling() #creates the background
-        player.draw(window) #creates the player
         render_environment() #creates the game world
+        player.draw(window) #creates the player
     
         #drawing bullets
         for bullet in bullets:
