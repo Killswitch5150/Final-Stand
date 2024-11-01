@@ -1,4 +1,4 @@
-import game_fonts
+import scripts.game_fonts as game_fonts
 
 #dependencies
 button_color_dark = (100, 100, 100) #define dark button color
