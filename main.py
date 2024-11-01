@@ -3,7 +3,7 @@ from settings import GameSettings, ScaleSettings
 from pygame.locals import *
 from variables import *
 
-console_debugging = True 
+console_debugging = False #change this to True to enable debugging log in console
 
 clock = pygame.time.Clock() #to implement frame limit
 
@@ -27,6 +27,15 @@ def create_tiling():
     for x in range(0, width, tile_width):
             for y in range(0, height, tile_height):
                 window.blit(tile_image, (x, y))
+
+def render_environment():
+            #draw world elements for the background
+            window.blit(spr_tree_image, (192, 64))
+            window.blit(spr_tree_image, (192, 96))
+            window.blit(spr_tree_image, (192, 128))
+            window.blit(spr_tree_image, (192, 448))
+            window.blit(spr_tree_image, (192, 480))
+            window.blit(spr_tree_image, (192, 512))
 
 def screen_size(): #function used by the full screen toggling function
     global screen_size_choice_fullscreen, flags, window #access global vars
@@ -242,12 +251,16 @@ class Player: #player class
         if self.ammo_count > 0: #check if player has ammo
             bullet = Bullet(self.rect.right, self.rect.centery) #create bullet
             bullets.append(bullet) #add bullet to bullet list
-            print("Bullet created") #debugging code
             self.ammo_count -= 1 #reduce ammo_count by 1 per shot
+            if console_debugging: #debug output
+                print('bullet created')
+                print(f'ammo_count: {self.ammo_count}')
         
     def draw(self, surface): #broken method intended for shooting animation
         if self.is_shooting: #if player is shooting
             surface.blit(self.shooting_image, self.rect.topleft) #change player sprite
+            if console_debugging: #debug output
+                print('player is shooting.')
         else: #if player is not shooting
             surface.blit(self.image, self.rect.topleft) #use the not shooting sprite
 
@@ -334,13 +347,22 @@ def game_over_screen(settings): #function to handle the game over screen
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if player quits
                 main_menu() #return to main menu
+                if console_debugging: #debug output
+                    print('user triggered quit')
             if event.type == pygame.KEYDOWN: #listen to key press
                 if event.key == pygame.K_F11: #if player presses F11
+                    if console_debugging: #debug output
+                        print('player pressed F11')
                     toggle_fullscreen() #execute the full screen toggle function
                 elif event.key == pygame.K_r: #if player presses R key
+                    if console_debugging: #debug output
+                        print('player pressed R')
+                        print('tracked vars being reset and game restarted')
                     reset_game(settings) #reset the game values stored in settings
                     main(settings) #restart main function (game)
                 elif event.key == pygame.K_q or pygame.K_ESCAPE: #if player hits Q or ESC
+                    if console_debugging: #debug output
+                        print('player pressed Q or ESC')
                     main_menu() #exit back to the main menu
 
 def main_menu(): #main menu function
@@ -355,29 +377,32 @@ def main_menu(): #main menu function
     while running: 
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if player quits
+                if console_debugging: #debug output
+                    print('player triggered quit')
                 pygame.quit() #quit
                 sys.exit() #if nothing to quit, exit the program
             if event.type == pygame.MOUSEBUTTONDOWN: #listen for mouse clicks
                 if button_rect.collidepoint(event.pos): #if player clicks on play button
+                    if console_debugging: #debug output
+                        print('player clicked on play button')
                     main(settings) #execute main function (start game)
                 if button2_rect.collidepoint(event.pos): #if player clicks on controls button
+                    if console_debugging: #debug output
+                        print('player clicked on controls button')
                     mm_controls() #show game controls by executing mm_controls function
             if event.type == pygame.KEYDOWN: #listen for key presses
                 if event.key == pygame.K_ESCAPE: #if player presses escape
+                    if console_debugging: #debug output
+                        print('player triggered quit with ESC')
                     pygame.quit() #quit
                     sys.exit() #if nothing to quit, exit the program
                 if event.key == pygame.K_F11: #if player presses F11
+                    if console_debugging: #debug output
+                        print('player pressed F11')
                     toggle_fullscreen() #execute the fullscreen toggling function
 
-        create_tiling()
-
-        #draw world elements for the background
-        window.blit(spr_tree_image, (192, 64))
-        window.blit(spr_tree_image, (192, 96))
-        window.blit(spr_tree_image, (192, 128))
-        window.blit(spr_tree_image, (192, 448))
-        window.blit(spr_tree_image, (192, 480))
-        window.blit(spr_tree_image, (192, 512))
+        create_tiling() #creates the background
+        render_environment() #creates the game world
 
         #drawing UI elements
         title_text = game_fonts.font.render(varGameName, True, (255, 0, 0)) #use varGameName for the main menu screen
@@ -403,17 +428,25 @@ def mm_controls(): #function to control the controls screen
     while running: #mm_controls loop
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if player quits window
+                if console_debugging: #debug output
+                    print('player triggered quit')
                 main_menu() #return to main menu
             if event.type == pygame.MOUSEBUTTONDOWN: #listen for mouse click
                 if button1_rect.collidepoint(event.pos):  #if player clicks on button rectangle
+                    if console_debugging: #debug output
+                        print('player clicked back')
                     main_menu()  #return to main menu
             if event.type == pygame.KEYDOWN: #key press listener  
                 if event.key == pygame.K_ESCAPE: #if player presses escape
+                    if console_debugging: #debug output
+                        print('player pressed ESC')
                     main_menu() #return to main menu
                 if event.key == pygame.K_F11: #if player presses F11 key
+                    if console_debugging: #debug output
+                        print('player pressed F11')
                     toggle_fullscreen() #execute the fullscreen toggling function
 
-        create_tiling()
+        create_tiling() #creates the background
 
         #drawing text displays to the screen
         window.blit(gui_text_vals.title_text1, (width // 2 - gui_text_vals.title_text1.get_width() // 2, height // 5))
@@ -455,7 +488,8 @@ def main(settings): #function to handle the main game loop
         wave_kills = settings.kill_count #define wave kills
         
         if settings.kill_count >= 10 * settings.current_wave: #every 10 kills
-            print(f"Wave {settings.current_wave + 1} is beginning") #debugging code
+            if console_debugging:
+                print(f"Wave {settings.current_wave + 1} is beginning") #debugging code
             settings.current_wave += 1 #increase wave by one
     
         #ensure maximum defined wave number can not be passsed
@@ -469,29 +503,45 @@ def main(settings): #function to handle the main game loop
 
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if user quits the window
+                if console_debugging: #debug output
+                    print('player triggered quit')
                 running = False #game is no longer running
             if event.type == pygame.KEYDOWN: #key press listener
                 if event.key == pygame.K_SPACE and player.ammo_count > 0: #if user hits space bar and has ammo
+                    if console_debugging: #debug output
+                        print('player triggered shoot')
                     sound_shooting()
                     player.shoot() #execute the shoot method from the player class 
                 if event.key == pygame.K_ESCAPE: #if user hits escape key
+                    if console_debugging: #debug output
+                        print('player pressed ESC')
                     game_over_screen(settings) #show the game over screen
                 if event.key == pygame.K_F11: #if user hits the F11 key
+                    if console_debugging: #debug output
+                        print('player pressed F11')
                     toggle_fullscreen() #execute the fullscreen toggling function
 
         keys = pygame.key.get_pressed() #reading key presses / key bindings
         player.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] #if Lshift or Rshift then issprinting becomes true
-        
+        if player.is_sprinting and console_debugging:
+            print('player is sprinting')
+
         player.update() #while game is looping, repeatedly execute update method of player class
 
         if player.is_shooting: #if the player is shooting
+            if console_debugging: #debug output
+                    print('executing shoot method of player class')
             player.shoot() #execute the shoot method of the player class
         
         if keys[pygame.K_r]: #if the user presses the R key
+            if console_debugging: #debug output
+                    print('player pressed R')
             if player.ammo_reserve > 0 and player.ammo_count < settings.player_magazine_size: #if player can shoot
                 #calculate how many rounds to reload
                 rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 #update ammo_count and ammo_reserve variables
+                if console_debugging: #debug output
+                    print('playing reload sound')
                 sound_reloading()
                 player.ammo_count += rounds_to_reload
                 player.ammo_reserve -= rounds_to_reload
@@ -503,6 +553,8 @@ def main(settings): #function to handle the main game loop
             
             if bullet.rect.x > settings.width: #if bullet leaves playable area (screen)
                 bullets.remove(bullet) #remove the bullet
+                if console_debugging: #debug output
+                    print('bullet obj went off scree and was removed')
             else: #if bullet remains on screen
                 bullet.draw(window) #draw the bullet object on the screen
 
@@ -512,6 +564,9 @@ def main(settings): #function to handle the main game loop
             spawn_point = random.choice(enemy_spawn_points) #choose a spawn point from the list of spawn points
             enemies.append(Enemy(*spawn_point, settings)) #create an object of the class enemy and pass spawn point and settings values
             enemy_spawn_timer = 0 #restart spawn timer
+            if console_debugging: #debug output
+                    print('enemy spawned')
+                    print(f'enemy respawn timer set to {enemy_spawn_timer}')
 
         #update enemies and check for collisions
         for enemy in enemies[:]:  #using a copy of the enemies list
@@ -519,6 +574,8 @@ def main(settings): #function to handle the main game loop
             if enemy.rect.x < 0: #if enemy goes off screen
                 enemies.remove(enemy) #remove the enemy from the game
                 player.health -= 10 #remove 10 health from the player
+                if console_debugging: #debug output
+                    print('enemy made it to the end of player side')
         
             #bullet collision logic
             for bullet in bullets[:]:  #using a copy of the bullets list
@@ -526,6 +583,9 @@ def main(settings): #function to handle the main game loop
                     bullets.remove(bullet) #remove bullet object
                     enemies.remove(enemy) #remove enemy object
                     settings.kill_count += 1 #add one to kill count
+                    if console_debugging: #debug output
+                        print('bullet and enemy collision detected')
+                        print(f'kills: {settings.kill_count}')
                     break #ensure if statement does not execute multiple times per kill. should be redundant and unneccessary
                 #offset_x, offset_y = int(enemy.update() - bullet.x), int(enemy.y - bullet.y)
                 #if bullet.mask.overlap(enemy.mask, (offset_x, offset_y)): #if bullet collides with enemy
@@ -550,6 +610,8 @@ def main(settings): #function to handle the main game loop
                     occupied_positions.add(spawn_point) #tell spawning system the spawn location is occupied until player picks up the ammo drop
                     ammo_drop_spawn_timer = 0 #reset spawn timer
                     spawn_successful = True #managing state change
+                    if console_debugging: #debug output
+                        print('ammo box spawned')
                 attempts += 1 #add one to attempts if ammo box can not spawn
 
         for ammo in ammo_boxes[:]: #using a copy of ammo box lists
@@ -559,24 +621,22 @@ def main(settings): #function to handle the main game loop
                     possible_ammo_drops = [12, 12, 12, 12, 24, 24, 24, 36, 36, 48, 72] #define ammo amounts possible in ammo drops (repeats to increase probability)
                     ammo_drop_size_decider = random.choice(possible_ammo_drops)
                     player.ammo_reserve += ammo_drop_size_decider #add the amount from ammo drop to the player's ammo reserve
-                    break #should be redundat, ensures system wont execute this multiple times per ammo drop
+                    if console_debugging: #debug output
+                        print('ammo box and player collision detected')
+                        print(f'player picked up {ammo_drop_size_decider} ammo')
+                    break #should be redundant, ensures system wont execute this multiple times per ammo drop
         
         if not ammo_boxes: #if there are no ammo boxes
             occupied_positions.clear() #clears the positions variable to free up space for new ones
-
+            
         if player.health <= 0: #if player health is zero
+            if console_debugging: #debug output
+                    print('player has died')
             game_over_screen(settings) #show the game over screen
 
-        create_tiling()
-
-        #drawing the game objects
-        player.draw(window) 
-        window.blit(spr_tree_image, (192, 64))
-        window.blit(spr_tree_image, (192, 96))
-        window.blit(spr_tree_image, (192, 128))
-        window.blit(spr_tree_image, (192, 448))
-        window.blit(spr_tree_image, (192, 480))
-        window.blit(spr_tree_image, (192, 512))
+        create_tiling() #creates the background
+        player.draw(window) #creates the player
+        render_environment() #creates the game world
     
         #drawing bullets
         for bullet in bullets:
