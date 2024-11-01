@@ -5,6 +5,10 @@ from variables import *
 from threading import Thread #to implement reload timer
 from threading import Lock #to implement reload timer data passing
 
+
+last_reload_time = 0
+reload_delay = 2000
+
 lock = Lock() #should enable me to pass info to and from threads
 
 console_debugging = False #change this to True to enable debugging log in console
@@ -590,25 +594,30 @@ def main(settings): #function to handle the main game loop
             if console_debugging: #debug output
                     print('player pressed R')
             if player.ammo_reserve > 0 and player.ammo_count < settings.player_magazine_size: #if player can shoot
-                global timingreload, can_reload, checkthread
+                global timingreload, can_reload, checkthread, last_reload_time, reload_delay
                 #calculate how many rounds to reload
+                current_time = pygame.time.get_ticks()
                 rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 #update ammo_count and ammo_reserve variables
                 
+                if current_time - last_reload_time >= reload_delay:
+                    print("reloading")
+                    
                 ##time logic##
-                timingreload = True 
-                checkthread = True
+                #timingreload = True 
+                #checkthread = True
                 
-                if console_debugging:
-                    print(f'can reload is: {can_reload}')
+                    if console_debugging:
+                        print(f'can reload is: {can_reload}')
                 
                 #time.sleep(2) #causes a stutter to simulate reload time
 
-                if console_debugging: #debug output
-                    print('playing reload sound')
-                sound_reloading()
-                player.ammo_count += rounds_to_reload
-                player.ammo_reserve -= rounds_to_reload
+                    if console_debugging: #debug output
+                        print('playing reload sound')
+                    sound_reloading()
+                    player.ammo_count += rounds_to_reload
+                    player.ammo_reserve -= rounds_to_reload
+                    last_reload_time = current_time
 
         #updating bullet positions
         for bullet in bullets[:]:  #use a copy of the list to avoid unwanted modifications
