@@ -5,6 +5,12 @@ from variables import *
 
 console_debugging = False #change this to True to enable debugging log in console
 
+last_reload_time = 0
+reload_delay = 1500
+shoot_delay = 500
+reload_completion_time = 0
+reloaderrors_spam = False 
+
 clock = pygame.time.Clock() #to implement frame limit
 
 #sound functions
@@ -146,6 +152,19 @@ def spawn_points_init():
 #end function defs
 
 #class defs
+class ReloadErrors:
+    def draw(self, surface):
+        import gui_text_vals
+        messageisvisible = True
+
+        #while messageisvisible:
+        #    surface.blit(gui_text_vals.reloadinprogresstext_cantshoot, (width // 2 - gui_text_vals.reloadingtext_empty.get_width() // 2, height // 4))
+        #    current_time3 = pygame.time.get_ticks()
+        #    msg_delay = 1000
+        #    if current_time3 >= msg_delay:
+        #        messageisvisible = False
+
+    
 class InputHandler: #handle 'Global' game key inputs (accessible anywhere in the game)
     def __init__(self):
         self.fullscreen_key = pygame.K_F11 #set the full screen toggle key to F11
@@ -528,6 +547,8 @@ def main(settings): #function to handle the main game loop
             enemy_spawn_interval = settings.waves[settings.current_wave - 1]['enemy_spawn_rate']
             ammo_drop_spawn_interval = settings.waves[settings.current_wave - 1]['ammo_spawn_rate']
 
+        current_time2 = pygame.time.get_ticks()
+
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if user quits the window
                 if console_debugging: #debug output
@@ -535,10 +556,18 @@ def main(settings): #function to handle the main game loop
                 running = False #game is no longer running
             if event.type == pygame.KEYDOWN: #key press listener
                 if event.key == pygame.K_SPACE and player.ammo_count > 0: #if user hits space bar and has ammo
+                    global reload_completion_time
                     if console_debugging: #debug output
                         print('player triggered shoot')
-                    sound_shooting()
-                    player.shoot() #execute the shoot method from the player class 
+                    if current_time2 - reload_completion_time >= shoot_delay:
+                        sound_shooting()
+                        player.shoot() #execute the shoot method from the player class
+                    elif current_time2 - reload_completion_time < shoot_delay:
+                        global reloaderrors_spam
+                        if console_debugging:
+                            print('you cant shoot while reloading')
+                        reloaderrors_spam = True 
+                        
                 if event.key == pygame.K_ESCAPE: #if user hits escape key
                     if console_debugging: #debug output
                         print('player pressed ESC')
@@ -554,24 +583,26 @@ def main(settings): #function to handle the main game loop
             print('player is sprinting')
 
         player.update() #while game is looping, repeatedly execute update method of player class
-
-        if player.is_shooting: #if the player is shooting
-            if console_debugging: #debug output
-                    print('executing shoot method of player class')
-            player.shoot() #execute the shoot method of the player class
         
         if keys[pygame.K_r]: #if the user presses the R key
             if console_debugging: #debug output
                     print('player pressed R')
             if player.ammo_reserve > 0 and player.ammo_count < settings.player_magazine_size: #if player can shoot
+                global last_reload_time, reload_delay
                 #calculate how many rounds to reload
+                current_time = pygame.time.get_ticks()
                 rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 #update ammo_count and ammo_reserve variables
-                if console_debugging: #debug output
-                    print('playing reload sound')
-                sound_reloading()
-                player.ammo_count += rounds_to_reload
-                player.ammo_reserve -= rounds_to_reload
+                
+                if current_time - last_reload_time >= reload_delay:
+                    if console_debugging: #debug output
+                        print('playing reload sound')
+                        print('reloading')
+                    sound_reloading()
+                    player.ammo_count += rounds_to_reload
+                    player.ammo_reserve -= rounds_to_reload
+                    last_reload_time = current_time
+                    reload_completion_time = current_time
 
         #updating bullet positions
         for bullet in bullets[:]:  #use a copy of the list to avoid unwanted modifications
@@ -676,6 +707,8 @@ def main(settings): #function to handle the main game loop
             if console_debugging:    
                 print('player needs to reload')
                 print('reload message displaying')
+        if reloaderrors_spam:
+            ReloadErrors_obj.draw(ReloadErrors, window)
     
         #drawing bullets
         for bullet in bullets:
@@ -706,6 +739,7 @@ def main(settings): #function to handle the main game loop
 #define init objects
 settings = GameSettings() #create settings obj
 scaling = ScaleSettings() #define scaling from ScaleSettings class (imported)
+ReloadErrors_obj = ReloadErrors
 
 #run init functions
 load_images() #execute load_images function
