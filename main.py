@@ -28,6 +28,15 @@ def create_tiling():
             for y in range(0, height, tile_height):
                 window.blit(tile_image, (x, y))
 
+def render_environment():
+            #draw world elements for the background
+            window.blit(spr_tree_image, (192, 64))
+            window.blit(spr_tree_image, (192, 96))
+            window.blit(spr_tree_image, (192, 128))
+            window.blit(spr_tree_image, (192, 448))
+            window.blit(spr_tree_image, (192, 480))
+            window.blit(spr_tree_image, (192, 512))
+
 def screen_size(): #function used by the full screen toggling function
     global screen_size_choice_fullscreen, flags, window #access global vars
     if screen_size_choice_fullscreen == True: 
@@ -393,14 +402,7 @@ def main_menu(): #main menu function
                     toggle_fullscreen() #execute the fullscreen toggling function
 
         create_tiling() #creates the background
-
-        #draw world elements for the background
-        window.blit(spr_tree_image, (192, 64))
-        window.blit(spr_tree_image, (192, 96))
-        window.blit(spr_tree_image, (192, 128))
-        window.blit(spr_tree_image, (192, 448))
-        window.blit(spr_tree_image, (192, 480))
-        window.blit(spr_tree_image, (192, 512))
+        render_environment() #creates the game world
 
         #drawing UI elements
         title_text = game_fonts.font.render(varGameName, True, (255, 0, 0)) #use varGameName for the main menu screen
@@ -633,15 +635,8 @@ def main(settings): #function to handle the main game loop
             game_over_screen(settings) #show the game over screen
 
         create_tiling() #creates the background
-
-        #drawing the game objects
-        player.draw(window) 
-        window.blit(spr_tree_image, (192, 64))
-        window.blit(spr_tree_image, (192, 96))
-        window.blit(spr_tree_image, (192, 128))
-        window.blit(spr_tree_image, (192, 448))
-        window.blit(spr_tree_image, (192, 480))
-        window.blit(spr_tree_image, (192, 512))
+        player.draw(window) #creates the player
+        render_environment() #creates the game world
     
         #drawing bullets
         for bullet in bullets:
