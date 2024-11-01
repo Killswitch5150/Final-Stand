@@ -5,7 +5,6 @@ from variables import *
 from threading import Thread #to implement reload timer
 from threading import Lock #to implement reload timer data passing
 
-
 last_reload_time = 0
 reload_delay = 2000
 
