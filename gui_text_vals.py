@@ -22,4 +22,5 @@ title_text3 = game_fonts.con_font2.render(varGClinetwo, True, (255, 0, 0))
 title_text4 = game_fonts.con_font2.render(varGClinethree, True, (255, 0, 0))
 title_text5 = game_fonts.con_font2.render(varGClinefour, True, (255, 0, 0))
 backtext = game_fonts.smallfont.render('BACK', True, button1_color_light) #create object for back button text
-        
+reloadingtext = game_fonts.font.render('[R] to Reload', True, (255, 0, 0))
+reloadingtext_empty = game_fonts.guifont.render('No Ammo To Reload. Collect Ammo Drops', True, (255, 0, 0))
