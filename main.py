@@ -1,40 +1,17 @@
-import pygame, sys, random, sounds, time 
+import pygame, sys, random, sounds
 from settings import GameSettings, ScaleSettings  
 from pygame.locals import *
 from variables import *
-from threading import Thread #to implement reload timer
-from threading import Lock #to implement reload timer data passing
-
-last_reload_time = 0
-reload_delay = 2000
-
-lock = Lock() #should enable me to pass info to and from threads
 
 console_debugging = False #change this to True to enable debugging log in console
 
-clock = pygame.time.Clock() #to implement frame limit
-timingreload = False
-can_reload = False
-checkthread = False
+last_reload_time = 0
+reload_delay = 2000
+shoot_delay = 1000
+reload_completion_time = 0
 
-#define threading functions
-def threaded_reload_timer(timingreload, can_reload, checkthread):
-    import time 
-    if console_debugging:
-        print('thread running')
-    while checkthread == True: #i cant get updated vars passed to this thread
-        if timingreload == True:
-            if console_debugging:
-                print('beginning reload timer')
-            can_reload = False 
-            time.sleep(1)
-            if console_debugging:
-                print('reload timer complete')
-        elif timingreload == False:
-            if console_debugging:
-                print('can reload')
-            can_reload = True 
-#end threading function
+
+clock = pygame.time.Clock() #to implement frame limit
 
 #sound functions
 def sound_reloading():
@@ -557,6 +534,8 @@ def main(settings): #function to handle the main game loop
             enemy_spawn_interval = settings.waves[settings.current_wave - 1]['enemy_spawn_rate']
             ammo_drop_spawn_interval = settings.waves[settings.current_wave - 1]['ammo_spawn_rate']
 
+        current_time2 = pygame.time.get_ticks()
+
         for event in pygame.event.get(): #event listener
             if event.type == pygame.QUIT: #if user quits the window
                 if console_debugging: #debug output
@@ -564,10 +543,12 @@ def main(settings): #function to handle the main game loop
                 running = False #game is no longer running
             if event.type == pygame.KEYDOWN: #key press listener
                 if event.key == pygame.K_SPACE and player.ammo_count > 0: #if user hits space bar and has ammo
+                    global reload_completion_time
                     if console_debugging: #debug output
                         print('player triggered shoot')
-                    sound_shooting()
-                    player.shoot() #execute the shoot method from the player class 
+                    if current_time2 - reload_completion_time >= shoot_delay:
+                        sound_shooting()
+                        player.shoot() #execute the shoot method from the player class 
                 if event.key == pygame.K_ESCAPE: #if user hits escape key
                     if console_debugging: #debug output
                         print('player pressed ESC')
@@ -583,40 +564,26 @@ def main(settings): #function to handle the main game loop
             print('player is sprinting')
 
         player.update() #while game is looping, repeatedly execute update method of player class
-
-        if player.is_shooting: #if the player is shooting
-            if console_debugging: #debug output
-                    print('executing shoot method of player class')
-            player.shoot() #execute the shoot method of the player class
         
         if keys[pygame.K_r]: #if the user presses the R key
             if console_debugging: #debug output
                     print('player pressed R')
             if player.ammo_reserve > 0 and player.ammo_count < settings.player_magazine_size: #if player can shoot
-                global timingreload, can_reload, checkthread, last_reload_time, reload_delay
+                global last_reload_time, reload_delay
                 #calculate how many rounds to reload
                 current_time = pygame.time.get_ticks()
                 rounds_to_reload = min(settings.player_magazine_size - player.ammo_count, player.ammo_reserve)  # Calculate how many rounds needed to fill the magazine
                 #update ammo_count and ammo_reserve variables
                 
                 if current_time - last_reload_time >= reload_delay:
-                    print("reloading")
-                    
-                ##time logic##
-                #timingreload = True 
-                #checkthread = True
-                
-                    if console_debugging:
-                        print(f'can reload is: {can_reload}')
-                
-                #time.sleep(2) #causes a stutter to simulate reload time
-
                     if console_debugging: #debug output
                         print('playing reload sound')
+                        print('reloading')
                     sound_reloading()
                     player.ammo_count += rounds_to_reload
                     player.ammo_reserve -= rounds_to_reload
                     last_reload_time = current_time
+                    reload_completion_time = current_time
 
         #updating bullet positions
         for bullet in bullets[:]:  #use a copy of the list to avoid unwanted modifications
@@ -757,14 +724,8 @@ load_images() #execute load_images function
 get_stats() #execute function to define size vars
 spawn_points_init() #initiate function to define spawn points
 
-#create threads
-thread_reload_time = Thread(target=threaded_reload_timer(timingreload, can_reload, checkthread)) #thread to handle reload timer
-thread_reload_time.start() #starts background thread for reloading
-thread_main = Thread(target=main_menu()) #main game handling thread
-thread_main.start() #starts thread
-
 #scene load order
-#main_menu()  #when game launches, start at the main menu
+main_menu()  #when game launches, start at the main menu
 pygame.quit()
 pygame.mixer.stop() #should be redundant. ensures sound doesn't continue to attempt to play
 sys.exit()
