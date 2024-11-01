@@ -1,4 +1,4 @@
-import pygame, variables #variables is where sound support is initialized
+import pygame, scripts.variables as variables #variables is where sound support is initialized
 
 default_volume = 0.5
 

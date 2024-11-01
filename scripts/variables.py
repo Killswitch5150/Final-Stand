@@ -1,5 +1,11 @@
 import pygame 
 
+last_reload_time = 0
+reload_delay = 1500
+shoot_delay = 500
+reload_completion_time = 0
+reloaderrors_spam = False 
+
 varGameName = "Final Stand" #name of the game to appear on window and UI
 screen_size_choice_fullscreen = False #default value for fullscreen toggle
 width, height = 800, 600  # window size vars

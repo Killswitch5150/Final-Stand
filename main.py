@@ -1,15 +1,9 @@
-import pygame, sys, random, sounds
-from settings import GameSettings, ScaleSettings  
+import pygame, sys, random, scripts.sounds as sounds
+from scripts.settings import GameSettings, ScaleSettings  
 from pygame.locals import *
-from variables import *
+from scripts.variables import *
 
 console_debugging = False #change this to True to enable debugging log in console
-
-last_reload_time = 0
-reload_delay = 1500
-shoot_delay = 500
-reload_completion_time = 0
-reloaderrors_spam = False 
 
 clock = pygame.time.Clock() #to implement frame limit
 
@@ -154,7 +148,7 @@ def spawn_points_init():
 #class defs
 class ReloadErrors:
     def draw(self, surface):
-        import gui_text_vals
+        import scripts.gui_text_vals as gui_text_vals
         messageisvisible = True
 
         #while messageisvisible:
@@ -189,7 +183,7 @@ class ReloadControl:
         self.needstoreload = True
 
     def update(self, surface, has_ammo):
-        import gui_text_vals
+        import scripts.gui_text_vals as gui_text_vals
         if has_ammo:
             window.blit(gui_text_vals.reloadingtext, (width // 2 - gui_text_vals.reloadingtext.get_width() // 2, height // 4))
         if not has_ammo:
@@ -202,7 +196,7 @@ class GameOver: #class to define end of game events
         self.font_small = pygame.font.Font(None, 30) #smaller font for end game GUI
         
     def display(self, surface):
-        import game_fonts
+        import scripts.game_fonts as game_fonts
 
         surface.fill((0, 0, 0)) #black background
 
@@ -369,7 +363,7 @@ class Ammo: #ammo class
 
 #begin scene funcs
 def game_over_screen(settings): #function to handle the game over screen
-    import game_fonts, gui_text_vals
+    import scripts.game_fonts as game_fonts, scripts.gui_text_vals as gui_text_vals
 
     eval_output = GameOver.evaluate_kills(GameOver, settings.kill_count)
 
@@ -412,7 +406,7 @@ def game_over_screen(settings): #function to handle the game over screen
                     main_menu() #exit back to the main menu
 
 def main_menu(): #main menu function
-    import game_fonts, gui_text_vals
+    import scripts.game_fonts as game_fonts, scripts.gui_text_vals as gui_text_vals
     #define variables for the main menu 
 
     button_rect = pygame.Rect(width // 2 - 100, height // 1.5 - 10, 200, 40) #define rectangle for button1 (play button)
@@ -464,7 +458,7 @@ def main_menu(): #main menu function
         pygame.display.flip() #show the screen to the player
 
 def mm_controls(): #function to control the controls screen
-    import game_fonts, gui_text_vals
+    import scripts.game_fonts as game_fonts, scripts.gui_text_vals as gui_text_vals
 
     #define the rectangle position and dimensions for the back button
     button1_rect = pygame.Rect(width // 2 - 50, height // 1.5 - 10, 100, 40)
@@ -512,7 +506,7 @@ def mm_controls(): #function to control the controls screen
         pygame.display.flip()
 
 def main(settings): #function to handle the main game loop
-    import game_fonts
+    import scripts.game_fonts as game_fonts
     
     reset_game(settings) #reset the games tracked variables whenever main loop is called
 
