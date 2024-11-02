@@ -728,28 +728,16 @@ def main(settings): #function to handle the main game loop
         create_tiling() #creates the background
         render_environment() #creates the game world
         player.draw(window) #creates the player
-
-        #reloading gui logic
-        if player.ammo_count == 0:
-            if player.ammo_reserve > 0:
-                has_ammo = True
-            elif player.ammo_reserve == 0:
-                has_ammo = False
-            reloadingalert = ReloadControl
-            reloadingalert.update(reloadingalert, window, has_ammo)
-            if console_debugging:    
-                print('player needs to reload')
-                print('reload message displaying')
-        if reloaderrors_spam:
-            ReloadErrors_obj.draw(ReloadErrors, window)
     
-        #drawing bullets
-        for bullet in bullets:
-            bullet.draw(window)
-
         #drawing enemies
         for enemy in enemies:
             enemy.draw(window)
+
+        create_bushes()
+
+        #drawing bullets
+        for bullet in bullets:
+            bullet.draw(window)
 
         #draw ammo boxes
         for ammo in ammo_boxes:
@@ -766,7 +754,20 @@ def main(settings): #function to handle the main game loop
         window.blit(kill_text, (width // 2 - kill_text.get_width() // 2, 10))
         window.blit(current_wave_text, (width // 2 - kill_text.get_width() // 2, 40))
 
-        create_bushes()
+        #reloading gui logic
+        if player.ammo_count == 0:
+            if player.ammo_reserve > 0:
+                has_ammo = True
+            elif player.ammo_reserve == 0:
+                has_ammo = False
+            reloadingalert = ReloadControl
+            reloadingalert.update(reloadingalert, window, has_ammo)
+            if console_debugging:    
+                print('player needs to reload')
+                print('reload message displaying')
+        if reloaderrors_spam:
+            ReloadErrors_obj.draw(ReloadErrors, window)
+        
         #display the screen to the player
         pygame.display.flip()
 
