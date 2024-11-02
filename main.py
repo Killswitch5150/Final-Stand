@@ -276,7 +276,7 @@ class GameOver: #class to define end of game events
                 if event.type == pygame.QUIT: #if player quits
                     pygame.quit() #quit game
                 if event.type == pygame.KEYDOWN: #read key input
-                    if event.key == pygame.K_r: #if player hits R key
+                    if event.key == pygame.K_x: #if player hits X key
                         if console_debugging: #debug output
                             print('user triggered game restart')
                         return "RESTART" #return restart value
@@ -428,7 +428,7 @@ def game_over_screen(settings): #function to handle the game over screen
                     if console_debugging: #debug output
                         print('player pressed F11')
                     toggle_fullscreen() #execute the full screen toggle function
-                elif event.key == pygame.K_r: #if player presses R key
+                elif event.key == pygame.K_x: #if player presses X key
                     if console_debugging: #debug output
                         print('player pressed R')
                         print('tracked vars being reset and game restarted')

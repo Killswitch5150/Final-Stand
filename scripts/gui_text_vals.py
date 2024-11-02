@@ -8,7 +8,7 @@ button1_color_light = (254, 254, 0)
 
 #only enter static values (no f strings or vars) the game will not be able to read them
 game_over_text = game_fonts.font.render(f"Game Over.", True, (255, 0, 0)) 
-restart_text = game_fonts.font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
+restart_text = game_fonts.font.render("Press [X] to Restart or [Q] to Quit", True, (255, 255, 255))
 text = game_fonts.smallfont.render('PLAY', True, button_color_light) #create label for play button
 text2 = game_fonts.smallfont.render('CONTROLS', True, button_color_light) #create label for controls button
 varControls = "Game Controls:"
