@@ -34,39 +34,39 @@ def create_road():
     for x in range(0, 800, road_bottom_width):
         window.blit(spr_road_bottom, (x, 332))
 
-def decide_bush_points():
-    global bush_x, bush_x_alt
-    bush_x_list = [300, 400, 500, 600]
-    bush_x = random.choice(bush_x_list)
-    bush_x_alt_list = [1, 2]
-    bush_x_alt_raw = random.choice(bush_x_alt_list)
-    if bush_x_alt_raw == 1:
-        bush_x_alt_int = 32
-    elif bush_x_alt_raw == 2:
-        bush_x_alt_int = -32
-    bush_x_alt = bush_x + bush_x_alt_int
+#def decide_bush_points():
+#    global bush_x, bush_x_alt
+#    bush_x_list = [300, 400, 500, 600]
+#    bush_x = random.choice(bush_x_list)
+#    bush_x_alt_list = [1, 2]
+#    bush_x_alt_raw = random.choice(bush_x_alt_list)
+#    if bush_x_alt_raw == 1:
+#        bush_x_alt_int = 32
+#    elif bush_x_alt_raw == 2:
+#        bush_x_alt_int = -32
+#    bush_x_alt = bush_x + bush_x_alt_int
 
-def create_bushes():
-    window.blit(spr_bush_image, (bush_x, 64))
-    window.blit(spr_bush_image, (bush_x, 96))
-    window.blit(spr_bush_image, (bush_x, 128))
-    window.blit(spr_bush_image, (bush_x, 160))
-    window.blit(spr_bush_image, (bush_x, 192))
-    window.blit(spr_bush_image, (bush_x, 384))
-    window.blit(spr_bush_image, (bush_x, 416))
-    window.blit(spr_bush_image, (bush_x, 448))
-    window.blit(spr_bush_image, (bush_x, 480))
-    window.blit(spr_bush_image, (bush_x, 512))
-    window.blit(spr_bush_image, (bush_x_alt, 64))
-    window.blit(spr_bush_image, (bush_x_alt, 96))
-    window.blit(spr_bush_image, (bush_x_alt, 128))
-    window.blit(spr_bush_image, (bush_x_alt, 160))
-    window.blit(spr_bush_image, (bush_x_alt, 192))
-    window.blit(spr_bush_image, (bush_x_alt, 384))
-    window.blit(spr_bush_image, (bush_x_alt, 416))
-    window.blit(spr_bush_image, (bush_x_alt, 448))
-    window.blit(spr_bush_image, (bush_x_alt, 480))
-    window.blit(spr_bush_image, (bush_x_alt, 512))
+#def create_bushes():
+#    window.blit(spr_bush_image, (bush_x, 64))
+#    window.blit(spr_bush_image, (bush_x, 96))
+#    window.blit(spr_bush_image, (bush_x, 128))
+#    window.blit(spr_bush_image, (bush_x, 160))
+#    window.blit(spr_bush_image, (bush_x, 192))
+#    window.blit(spr_bush_image, (bush_x, 384))
+#    window.blit(spr_bush_image, (bush_x, 416))
+#    window.blit(spr_bush_image, (bush_x, 448))
+#    window.blit(spr_bush_image, (bush_x, 480))
+#    window.blit(spr_bush_image, (bush_x, 512))
+#    window.blit(spr_bush_image, (bush_x_alt, 64))
+#    window.blit(spr_bush_image, (bush_x_alt, 96))
+#    window.blit(spr_bush_image, (bush_x_alt, 128))
+#    window.blit(spr_bush_image, (bush_x_alt, 160))
+#    window.blit(spr_bush_image, (bush_x_alt, 192))
+#    window.blit(spr_bush_image, (bush_x_alt, 384))
+#    window.blit(spr_bush_image, (bush_x_alt, 416))
+#    window.blit(spr_bush_image, (bush_x_alt, 448))
+#    window.blit(spr_bush_image, (bush_x_alt, 480))
+#    window.blit(spr_bush_image, (bush_x_alt, 512))
 
 def render_environment():
             #draw world elements for the background
@@ -185,13 +185,6 @@ class ReloadErrors:
         import scripts.gui_text_vals as gui_text_vals
         messageisvisible = True
 
-        #while messageisvisible:
-        #    surface.blit(gui_text_vals.reloadinprogresstext_cantshoot, (width // 2 - gui_text_vals.reloadingtext_empty.get_width() // 2, height // 4))
-        #    current_time3 = pygame.time.get_ticks()
-        #    msg_delay = 1000
-        #    if current_time3 >= msg_delay:
-        #        messageisvisible = False
-
     
 class InputHandler: #handle 'Global' game key inputs (accessible anywhere in the game)
     def __init__(self):
@@ -269,22 +262,6 @@ class GameOver: #class to define end of game events
             return "Pretty Good"
         else:
             return "Get A Life"
-    
-    def handle_input(self): #function to handle input
-        while True: #loop while input handling is active
-            for event in pygame.event.get(): #read events
-                if event.type == pygame.QUIT: #if player quits
-                    pygame.quit() #quit game
-                if event.type == pygame.KEYDOWN: #read key input
-                    if event.key == pygame.K_x: #if player hits X key
-                        if console_debugging: #debug output
-                            print('user triggered game restart')
-                        return "RESTART" #return restart value
-                    if event.key == pygame.K_q or pygame.K_ESCAPE: #if player hits Q or ESC key
-                        if console_debugging: #debug output
-                            print('user triggered quit game')
-                        return "QUIT" #return quit value
-            return None #return none if input is invalid 
 
 class Player: #player class
     def __init__(self, x, y):
@@ -448,7 +425,7 @@ def main_menu(): #main menu function
 
     running = True #enables running loop to begin
 
-    decide_bush_points()
+    #decide_bush_points()
 
     while running: 
         for event in pygame.event.get(): #event listener
@@ -479,7 +456,7 @@ def main_menu(): #main menu function
 
         create_tiling() #creates the background
         render_environment() #creates the game world
-        create_bushes()
+        #create_bushes()
 
         #drawing UI elements
         title_text = game_fonts.font.render(varGameName, True, (255, 0, 0)) #use varGameName for the main menu screen
@@ -556,7 +533,7 @@ def main(settings): #function to handle the main game loop
     ammo_drop_spawn_interval = 100000 #spawn timer placeholder variable for initialization
     enemy_spawn_timer = 0 #enemy timer placeholder variable for initialization
 
-    decide_bush_points()
+    #decide_bush_points()
 
     running = True #allows main loop to execute
 
@@ -733,7 +710,7 @@ def main(settings): #function to handle the main game loop
         for enemy in enemies:
             enemy.draw(window)
 
-        create_bushes()
+        #create_bushes()
 
         #drawing bullets
         for bullet in bullets:
