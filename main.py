@@ -270,21 +270,21 @@ class GameOver: #class to define end of game events
         else:
             return "Get A Life"
     
-    def handle_input(self): #function to handle input
-        while True: #loop while input handling is active
-            for event in pygame.event.get(): #read events
-                if event.type == pygame.QUIT: #if player quits
-                    pygame.quit() #quit game
-                if event.type == pygame.KEYDOWN: #read key input
-                    if event.key == pygame.K_x: #if player hits X key
-                        if console_debugging: #debug output
-                            print('user triggered game restart')
-                        return "RESTART" #return restart value
-                    if event.key == pygame.K_q or pygame.K_ESCAPE: #if player hits Q or ESC key
-                        if console_debugging: #debug output
-                            print('user triggered quit game')
-                        return "QUIT" #return quit value
-            return None #return none if input is invalid 
+    #def handle_input(self): #function to handle input
+    #    while True: #loop while input handling is active
+    #        for event in pygame.event.get(): #read events
+    #            if event.type == pygame.QUIT: #if player quits
+    #                pygame.quit() #quit game
+    #            if event.type == pygame.KEYDOWN: #read key input
+    #                if event.key == pygame.K_x: #if player hits X key
+    #                    if console_debugging: #debug output
+    #                        print('user triggered game restart')
+    #                    return "RESTART" #return restart value
+    #                if event.key == pygame.K_q or pygame.K_ESCAPE: #if player hits Q or ESC key
+    #                    if console_debugging: #debug output
+    #                        print('user triggered quit game')
+    #                    return "QUIT" #return quit value
+    #        return None #return none if input is invalid 
 
 class Player: #player class
     def __init__(self, x, y):
