@@ -2,12 +2,6 @@ Project Notes:
 Development began on 21 October 2024
 
 To do list:
--Figure out how to incorporate animations (player shooting/muzzle flash)
--Maybe create a player class to simplify in-game actions
--Create more game world visual elements
--Implement more randomness to bush generation
--Add probability of bullet getting "lost in bushes"
 -Fix GUI prompts showing up under certain game world elements
 -Create different enemy types (some that have more health, maybe)
 -Migrate more set-up data and instructions to a different py/json file, to clean up main code file
--Add Settings to main menu to change full screen, volume and other variables
