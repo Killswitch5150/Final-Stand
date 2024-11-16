@@ -2,6 +2,4 @@ Project Notes:
 Development began on 21 October 2024
 
 To do list:
--Fix GUI prompts showing up under certain game world elements
 -Create different enemy types (some that have more health, maybe)
--Migrate more set-up data and instructions to a different py/json file, to clean up main code file
