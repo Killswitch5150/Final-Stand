@@ -1,5 +1,5 @@
 Project Notes:
 Development began on 21 October 2024
 
-To do list:
--Create different enemy types (some that have more health, maybe)
+Contributors:
+Killswitch5150
