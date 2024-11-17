@@ -271,7 +271,7 @@ class Player: #player class
         self.ammo_count = 24 #set magazine size
         self.ammo_reserve = 0 #set ammo reserve starting count
         self.is_shooting = False #player does not spawn in shooting
-        self.is_sprinting = False #player does not spawn in sprinting
+        #self.is_sprinting = False #player does not spawn in sprinting
         self.speed = 3.5 #set player speed
 
         #loading player sprite using load_and_scale_image function
@@ -282,7 +282,7 @@ class Player: #player class
     def update(self):
         #update position based on player input
         keys = pygame.key.get_pressed() #read key input
-        speed = self.speed + 1.5 if self.is_sprinting else self.speed #player speed modification for sprinting
+        #speed = self.speed + 1.5 if self.is_sprinting else self.speed #player speed modification for sprinting
 
         #player movement logic
         if keys[pygame.K_UP] or keys[pygame.K_w]: 
@@ -588,9 +588,9 @@ def main(settings): #function to handle the main game loop
                     toggle_fullscreen() #execute the fullscreen toggling function
 
         keys = pygame.key.get_pressed() #reading key presses / key bindings
-        player.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] #if Lshift or Rshift then issprinting becomes true
-        if player.is_sprinting and console_debugging:
-            print('player is sprinting')
+        #player.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] #if Lshift or Rshift then issprinting becomes true
+        #if player.is_sprinting and console_debugging:
+        #    print('player is sprinting')
 
         player.update() #while game is looping, repeatedly execute update method of player class
         
