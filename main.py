@@ -286,9 +286,9 @@ class Player: #player class
 
         #player movement logic
         if keys[pygame.K_UP] or keys[pygame.K_w]: 
-            self.y -= speed
+            self.y -= self.speed
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.y += speed
+            self.y += self.speed
             
         #ensure player stays on screen
         if self.y < 0:
