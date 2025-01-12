@@ -5,7 +5,7 @@ def load_and_scale_image(path, scale_factor):  # function to load sprites
     image = pygame.image.load(path).convert_alpha()  # load image
     return pygame.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor)))  # return image
 
-def run_pygame_splash_screen(image_path="./splash/img/pygame_powered_logo.png", scale_factor=0.5, timer_duration=5000):
+def run_pygame_splash_screen(image_path="./splash/img/pygame_powered_logo.png", scale_factor=0.3, timer_duration=3000):
     """
     Runs the splash screen with a 5-second timer.
 
@@ -16,9 +16,10 @@ def run_pygame_splash_screen(image_path="./splash/img/pygame_powered_logo.png", 
     """
     pygame.init()  # Initialize Pygame
 
-    game_resolution = (960, 540)  # Set game resolution
-    flags = 0  # No flags
-    window = pygame.display.set_mode(game_resolution, flags, 24)  # Create the window
+    
+    #game_resolution = (960, 540)  # Set game resolution
+    game_resolution = (800, 600)  # Set game resolution
+    window = pygame.display.set_mode(game_resolution, pygame.DOUBLEBUF, 24)  # Create the window
 
     # Load and scale the image
     image = load_and_scale_image(image_path, scale_factor)
@@ -50,7 +51,7 @@ def run_pygame_splash_screen(image_path="./splash/img/pygame_powered_logo.png", 
 
         # Blit the image to the screen
         window.fill((0, 0, 0))  # Clear the screen with black
-        window.blit(image, (100, 100))  # Draw the image at position (100, 100)
+        window.blit(image, (170, 200))  # Draw the image at position (100, 100)
         
         # Update the display
         pygame.display.update()

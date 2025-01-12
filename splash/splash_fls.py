@@ -5,7 +5,7 @@ def load_and_scale_image(path, scale_factor):  # Function to load and scale spri
     image = pygame.image.load(path).convert_alpha()  # Load image
     return pygame.transform.scale(image, (int(image.get_width() * scale_factor), int(image.get_height() * scale_factor)))  # Return scaled image
 
-def run_splash_screen(image_path="./splash/img/frontlinestudios_logo_1080.png", scale_factor=0.5, timer_duration=5000):
+def run_splash_screen(image_path="./splash/img/frontlinestudios_logo_1080.png", scale_factor=0.4, timer_duration=3000):
     """
     Runs the splash screen with a 5-second timer.
 
@@ -16,9 +16,9 @@ def run_splash_screen(image_path="./splash/img/frontlinestudios_logo_1080.png", 
     """
     pygame.init()  # Initialize Pygame
 
-    game_resolution = (960, 540)  # Set game resolution
-    flags = 0  # No flags
-    window = pygame.display.set_mode(game_resolution, flags, 24)  # Create the window
+    #game_resolution = (960, 540)  # Set game resolution
+    game_resolution = (800, 600)  # Set game resolution
+    window = pygame.display.set_mode(game_resolution, pygame.DOUBLEBUF, 24)  # Create the window
 
     # Load and scale the image
     image = load_and_scale_image(image_path, scale_factor)
@@ -50,7 +50,7 @@ def run_splash_screen(image_path="./splash/img/frontlinestudios_logo_1080.png", 
 
         # Blit the image to the screen
         window.fill((0, 0, 0))  # Clear the screen with black
-        window.blit(image, (0, 0))  # Draw the image at position (0, 0)
+        window.blit(image, (25, 80))  # Draw the image at position (0, 0)
         
         # Update the display
         pygame.display.update()
