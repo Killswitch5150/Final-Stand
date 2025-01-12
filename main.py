@@ -2,6 +2,11 @@ import pygame, sys, random, scripts.sounds as sounds
 from scripts.settings import GameSettings, ScaleSettings  
 from pygame.locals import *
 from scripts.variables import *
+from splash import splash_fls, splash_pygame
+
+#wip splash screens
+#splash_fls.run_splash_screen() #run splash screen for front line studios
+#splash_pygame.run_pygame_splash_screen() #run splash screen for front line studios
 
 console_debugging = False #change this to True to enable debugging log in console
 
