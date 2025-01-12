@@ -2,10 +2,9 @@ import pygame, sys, random, scripts.sounds as sounds
 from scripts.settings import GameSettings, ScaleSettings  
 from pygame.locals import *
 from scripts.variables import *
-#from splash import splash_fls, splash_pygame
 import controller
 
-controller.splash_screens()
+controller.splash_screens() #runs splash screens established in ./splash subdirectory, comment out to skip
 
 console_debugging = False #change this to True to enable debugging log in console
 
