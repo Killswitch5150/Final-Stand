@@ -2,6 +2,9 @@ import pygame, sys, random, scripts.sounds as sounds
 from scripts.settings import GameSettings, ScaleSettings  
 from pygame.locals import *
 from scripts.variables import *
+import controller
+
+controller.splash_screens() #runs splash screens established in ./splash subdirectory, comment out to skip
 
 console_debugging = False #change this to True to enable debugging log in console
 
@@ -286,9 +289,9 @@ class Player: #player class
 
         #player movement logic
         if keys[pygame.K_UP] or keys[pygame.K_w]: 
-            self.y -= speed
+            self.y -= self.speed
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.y += speed
+            self.y += self.speed
             
         #ensure player stays on screen
         if self.y < 0:
