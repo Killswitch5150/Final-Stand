@@ -7,3 +7,8 @@ This code is provided as-is with no warranty, and no continued support should be
 
 Instructions:
 To run the game, the main.py module needs to be executed. All other scripts are called by main.py to control different aspects of the game.
+
+System Requirements:
+Until this project is available as an executable, it runs as python, meaning that all dependencies need to be downloaded by the user before the game can run.
+This project requires
+-Pygame
